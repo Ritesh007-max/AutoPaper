@@ -6,6 +6,23 @@
     <title>Document</title>
 </head>
 <body>
-    
+   <h1>AUTOPAPER</h1>
+<%for(let q of question){
+    if(typeof q === 'string'){%>
+    <h5><%= q %></h5>
+    <%}else{
+        if(q.questionType === 'MCQ'){%>
+        <p><%=q.questionText%></p>
+        <p>(A)<%=q.options[0]%></p>
+        <p>(B)<%=q.options[1]%></p>
+        <p>(C)<%=q.options[2]%></p>
+        <p>(D)<%=q.options[3]%></p>
+        <%}else{%>
+            <p><%=q.questionText%></p>
+           <% }
+    }
+}%>
+  
 </body>
 </html>
+
