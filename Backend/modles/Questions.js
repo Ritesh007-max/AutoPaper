@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const questionSchema = new mongoose.Schema({
   questionText: { type: String, required: true },
-  questionType: { type: String, enum: ['MCQ', 'short', 'long', 'numerical'], required: true },
+  questionType: { type: String, enum: ['MCQ','obj', 'gr','1m', '2m', '3m','5m'], required: true },
   options: [String],          // only filled for MCQ
   answer: { type: String },
   subject: { type: String, required: true },
