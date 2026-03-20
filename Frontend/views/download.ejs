@@ -7,10 +7,6 @@
 </head>
 <body>
    <h1>AUTOPAPER</h1>
-<form action="/download" method="get">
-    <button>Download</button>
-</form>
-
 
 <%let i = 0%>
 <%for(let q of question){
@@ -31,6 +27,11 @@
 }%>
 
 </body>
+<script>
+    window.onload = function(){
+        setTimeout(function(){
+            window.print()
+        }, 2000)
+    }
+</script>
 </html>
-
-
