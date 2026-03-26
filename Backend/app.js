@@ -1,6 +1,6 @@
 const express = require('express')
 const Question = require('./modles/Questions')
-const app = express()
+const app = express()    
 app.use(express.json())
 
 
