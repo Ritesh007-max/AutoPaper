@@ -1,0 +1,104 @@
+
+    <% layout("../layout/boilerplate.ejs") -%>
+
+    <main>
+      <section class="home-form-only">
+        <form class="dropdown-form solo-form" id="programForm" method="get" action="http://localhost:8080/modern">
+          <div class="input-grid centered-grid expanded-grid">
+            <div class="custom-dropdown-container" data-placeholder="Choose program">
+              <span>College</span>
+              <div class="dropdown-header" tabindex="0">
+                <span class="dropdown-title">Choose College</span>
+                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div class="dropdown-list">
+                <label class="checkbox-label">
+                  <input type="radio" name="programType" value="PES Modern College of Engineering" class="custom-checkbox hidden-input"> PES Modern College of Engineering
+                </label>
+                <!-- <label class="checkbox-label">
+                  <input type="radio" name="programType" value="Skill Workshops" class="custom-checkbox hidden-input"> Skill Workshops
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="programType" value="Exam Preparation" class="custom-checkbox hidden-input"> Exam Preparation
+                </label> -->
+              </div>
+            </div>
+
+            <div class="custom-dropdown-container" data-placeholder="Select level">
+              <span>Exam Type</span>
+              <div class="dropdown-header" tabindex="0">
+                <span class="dropdown-title">Select Type</span>
+                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div class="dropdown-list">
+                <label class="checkbox-label">
+                  <input type="radio" name="learningLevel" value="C.I.E.2" class="custom-checkbox hidden-input"> C.I.E.2
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="learningLevel" value="C.I.E.3" class="custom-checkbox hidden-input"> C.I.E.3
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="learningLevel" value="S.E.E." class="custom-checkbox hidden-input"> S.E.E.
+                </label>
+              </div>
+            </div>
+
+            <div class="custom-dropdown-container" data-placeholder="Choose subject(s)">
+              <span>Subject</span>
+              <div class="dropdown-header" tabindex="0">
+                <span class="dropdown-title">Choose Subject</span>
+                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div class="dropdown-list">
+                <label class="checkbox-label">
+                  <input type="radio" name="subjectArea" value="Applied Mechanics" class="custom-checkbox hidden-input"> Applied Mechanics
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="subjectArea" value="Mathematics-2" class="custom-checkbox hidden-input"> Mathematics-2
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="subjectArea" value="P.P.S" class="custom-checkbox hidden-input"> P.P.S.
+                </label>
+                <label class="checkbox-label">
+                  <input type="radio" name="subjectArea" value="Chemistry" class="custom-checkbox hidden-input"> Chemistry
+                </label>
+              </div>
+            </div>
+
+            <div class="custom-dropdown-container" data-placeholder="Select mode">
+              <span>Mode</span>
+              <div class="dropdown-header" tabindex="0">
+                <span class="dropdown-title">Select mode</span>
+                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div class="dropdown-list">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u1" class="custom-checkbox"> Unit 1
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u2" class="custom-checkbox"> Unit 2
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u3" class="custom-checkbox"> Unit 3
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u5" class="custom-checkbox"> Unit 4
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u5" class="custom-checkbox"> Unit 5
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="u6" class="custom-checkbox"> Unit 6
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions center-actions">
+            <button type="submit" class="primary-btn">Start Exploring</button>
+            <p id="formMessage" class="form-message" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+

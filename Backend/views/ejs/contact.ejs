@@ -1,0 +1,43 @@
+ <% layout("../layout/boilerplate.ejs") -%>
+
+    <main class="inner-page">
+      <section class="page-hero compact">
+        <span class="eyebrow">Contact us</span>
+        <h1>Talk to our team about admissions, programs, or learning support.</h1>
+        <p>Use the contact details below or send a message through the form.</p>
+      </section>
+
+      <section class="contact-layout">
+        <div class="contact-info">
+          <div class="info-card">
+            <h2>Reach us</h2>
+            <p>Email: hello@edusparkacademy.com</p>
+            <p>Phone: +91 98765 43210</p>
+            <p>Address: 14 Learning Avenue, Bengaluru</p>
+          </div>
+          <div class="info-card">
+            <h2>Office hours</h2>
+            <p>Monday to Friday: 9:00 AM - 6:00 PM</p>
+            <p>Saturday: 10:00 AM - 2:00 PM</p>
+            <p>Sunday: Closed</p>
+          </div>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <label>
+            <span>Your Name</span>
+            <input class="form-input" id="contactNameInput" type="text" placeholder="Enter your name" required>
+          </label>
+          <label>
+            <span>Email Address</span>
+            <input class="form-input" id="contactEmailInput" type="email" placeholder="Enter your email" required>
+          </label>
+          <label>
+            <span>Message</span>
+            <textarea class="form-input" id="contactMessageInput" rows="5" placeholder="Tell us what you need" required></textarea>
+          </label>
+          <button type="submit" class="primary-btn">Send Message</button>
+          <p id="contactMessage" class="form-message" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>

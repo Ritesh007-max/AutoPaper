@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
-const Question = require('./modles/Questions');
+const Question = require('../modles/Questions');
 
 const data = JSON.parse(fs.readFileSync('./SSC_Science1_Mongoose_v2.json', 'utf-8'));
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPaper</title>
+</head>
+<body>
+   <h1>AUTOPAPER</h1>
+
+<%let i = 0%>
+<%for(let q of question){
+    if(typeof q === 'string'){i=0%>
+    <h5><%= q %></h5>
+    <%}else{
+        if(q.questionType === 'MCQ'){i=i+1;%>
+        <p>(<%=i%>)<%=q.questionText%></p>
+        <p>(A)<%=q.options[0]%></p>
+        <p>(B)<%=q.options[1]%></p>
+        <p>(C)<%=q.options[2]%></p>
+        <p>(D)<%=q.options[3]%></p>
+        
+        <%}else{ i=i+1;%>
+            <p>(<%=i%>)<%=q.questionText%></p>
+        <%}
+    }
+}%>
+
+</body>
+<script>
+    window.onload = function(){
+        setTimeout(function(){
+            window.print()
+        }, 1500)
+    }
+</script>
+</html>
