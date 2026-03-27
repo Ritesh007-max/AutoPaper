@@ -1,4 +1,7 @@
 function QuestionCard({ question, onDelete, onEdit }) {
+  const canEdit = typeof onEdit === 'function'
+  const canDelete = typeof onDelete === 'function'
+
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -16,22 +19,28 @@ function QuestionCard({ question, onDelete, onEdit }) {
           </div>
           <h3 className="mt-4 text-lg font-bold text-slate-900">{question.questionText}</h3>
         </div>
-        <div className="flex gap-2">
-          <button
-            className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            type="button"
-            onClick={() => onEdit(question)}
-          >
-            Edit
-          </button>
-          <button
-            className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-600"
-            type="button"
-            onClick={() => onDelete(question._id)}
-          >
-            Delete
-          </button>
-        </div>
+        {canEdit || canDelete ? (
+          <div className="flex gap-2">
+            {canEdit ? (
+              <button
+                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                type="button"
+                onClick={() => onEdit(question)}
+              >
+                Edit
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-600"
+                type="button"
+                onClick={() => onDelete(question._id)}
+              >
+                Delete
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-4 grid gap-3 text-sm text-slate-600 md:grid-cols-2">
