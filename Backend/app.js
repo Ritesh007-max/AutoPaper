@@ -1,23 +1,9 @@
 const express = require('express')
 const Question = require('./modles/Questions')
-const app = express()    
+const app = express()
 app.use(express.json())
 
-
-app.get('/', (req, res) => {
-  res.json({
-    message: 'AutoPaper API is running',
-    routes: {
-      questions: {
-        get: "/api/questions", //gets questions all or specific coz it has filteration
-        post: "/api/addQuestion", //adds a single question
-        post: "/api/addQuestions", //adds multiple questions
-      }
-    }
-  })
-})
-
-app.get('/api/questions', async (req, res) => {
+app.get('/teacher/questions', async (req, res) => {
 
   try {
     const { subject, chapter, questionType, difficulty, grade } = req.query
@@ -52,7 +38,7 @@ app.get('/api/questions', async (req, res) => {
   }
 })
 
-app.post('/api/addQuestion', async (req, res) => {
+app.post('/teacher/addQuestion', async (req, res) => {
   try {
     const { questionText, questionType, options, answer, subject, chapter, grade, difficulty, marks } = req.body
 
@@ -69,7 +55,7 @@ app.post('/api/addQuestion', async (req, res) => {
   }
 })
 
-app.post('/api/addQuestions', async (req, res) => {
+app.post('/teacher/addQuestions', async (req, res) => {
   try {
 
     await Question.insertMany(req.body)
@@ -87,7 +73,7 @@ app.post('/api/addQuestions', async (req, res) => {
   }
 })
 
-app.put('/api/updateQuestion/:id', async (req, res) => {
+app.put('/teacher/updateQuestion/:id', async (req, res) => {
   try {
     const { id } = req.params
 
@@ -116,7 +102,7 @@ app.put('/api/updateQuestion/:id', async (req, res) => {
   }
 })
 
-app.delete('/api/deleteQuestion/:id', async (req, res) => {
+app.delete('/teacher/deleteQuestion/:id', async (req, res) => {
   try {
     const { id } = req.params
 
