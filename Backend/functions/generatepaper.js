@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 const Question = require("../modles/Questions")
-main().catch((err)=>{
-    console.log(err)
-})
-async function main(){
-    mongoose.connect("mongodb://localhost:27017/autopaper")
-}
 
 async function generateqp(){
     cqp = [];

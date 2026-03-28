@@ -3,34 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoPaper</title>
+    <title>EduSpark</title>
+    <link rel="stylesheet" href="paper.css">
 </head>
 <body>
-   <h1>AUTOPAPER</h1>
+   
 <form action="/download" method="get">
     <button>Download</button>
-</form>
-
+</form><br><hr>
+<h1>EduSpark</h1><hr>
 
 <%let i = 0%>
-<%for(let q of question){
-    if(typeof q === 'string'){i=0%>
+<%for(let q of question){%>
+    <%if(typeof q === 'string'){i=0%>
     <h5><%= q %></h5>
-    <%}else{
-        if(q.questionType === 'MCQ'){i=i+1;%>
-        <p>(<%=i%>)<%=q.questionText%></p>
-        <p>(A)<%=q.options[0]%></p>
-        <p>(B)<%=q.options[1]%></p>
-        <p>(C)<%=q.options[2]%></p>
-        <p>(D)<%=q.options[3]%></p>
+    <%}else{%>
+        <%if(q.questionType === "MCQ"){i=i+1;%>
+        <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3>
+        <p>(A)&nbsp;<%=q.options[0]%></p>
+        <p>(B)&nbsp;<%=q.options[1]%></p>
+        <p>(C)&nbsp;<%=q.options[2]%></p>
+        <p>(D)&nbsp;<%=q.options[3]%></p><br>
         
-        <%}else{ i=i+1;%>
-            <p>(<%=i%>)<%=q.questionText%></p>
-        <%}
-    }
-}%>
+        <%}else{%>
+           <% if(q.hasImage == "yes"){i=i+1;%>
+                <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3>
+                <img src="<%=q.image%>" alt="question image">  <br> 
+            <%}else{%>
+                <%i=i+1;%>
+            <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3><br>
+            <%}%>
+<%}}}%>
 
 </body>
 </html>
 
-
+ 

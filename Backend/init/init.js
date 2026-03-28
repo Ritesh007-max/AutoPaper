@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const Question = require('../modles/Questions');
 
-const data = JSON.parse(fs.readFileSync('./SSC_Science1_Mongoose_v2.json', 'utf-8'));
+const data = JSON.parse(fs.readFileSync('../unit4_apm.json', 'utf-8'));
 
 main().then(()=>{
     console.log('Connected to MongoDB');
@@ -11,12 +11,13 @@ main().then(()=>{
 })
 
 async function main() {
-    await mongoose.connect('mongodb://localhost:27017/autopaper');
+    await mongoose.disconnect();
+    await mongoose.connect('mongodb://localhost:27017/autopap');
 }
 
 async function enterdata() {
   try {
-    await Question.deleteMany({});
+    // await Question.deleteMany({});
     await Question.insertMany(data); 
 
     console.log(` ${data.length} questions inserted successfully!`);
