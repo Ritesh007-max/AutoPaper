@@ -7,9 +7,11 @@
         <link rel="stylesheet" href="paper.css">
 
 </head>
-<body><br><hr>
-   <h1>EduSpark</h1>
-   <hr>
+<body><br>
+  <div class="pap-head"><img class="logo" src="https://image2url.com/r2/default/images/1774877777631-c38ec464-c4e5-4b44-8a74-48f22bb64834.jpeg"
+ alt="logo">
+<h1>EduSpark</h1></div>
+   
 <%let i = 0%>
 <%for(let q of question){%>
     <%if(typeof q === 'string'){i=0%>
@@ -25,7 +27,7 @@
         <%}else{%>
            <% if(q.hasImage == "yes"){i=i+1;%>
                 <h3>(<%=i%>)<%=q.questionText%></h3>
-                <img src="<%=q.image%>" alt="question image"> <br>  
+                <img class="center" src="<%=q.image%>" alt="question image"> <br>  
             <%}else{%>
                 <%i=i+1;%>
             <h3>(<%=i%>)<%=q.questionText%></h3><br>

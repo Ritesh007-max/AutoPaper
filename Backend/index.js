@@ -5,15 +5,18 @@ const mongoose = require("mongoose");
 const ejs= require("ejs");
 const path = require("path");
 const ejsMate = require("ejs-mate");
-
+const cookieParser = require('cookie-parser');
 
 const generateqp = require("./functions/generatepaper.js");
 const eqp = require("./functions/eqp.js");
 const emcq = require("./functions/emcq.js");
 const apm = require("./functions/apm.js");
+const pps = require("./functions/pps.js");
 const home = require("./routes/home.js");
 const about = require("./routes/about.js");
 const contact = require("./routes/contact.js");
+const dotenv= require('dotenv');
+dotenv.config();
 
 app.engine("ejs", ejsMate); 
 app.set("view engine","ejs")
@@ -21,6 +24,7 @@ app.set("views",path.join(__dirname,'./views/ejs'))
 app.use(express.static(path.join(__dirname,'./public')));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser());
 
 main().then(()=>{
     console.log("connected")
@@ -57,27 +61,32 @@ app.get("/apm",async (req,res)=>{
     res.render("index.ejs", {question :qp})
 })
 
+app.get("/pps",async (req,res)=>{
+    let qp = await pps();
+    console.log(qp);
+    cqp=qp;
+    res.render("index.ejs", {question :qp})
+})
+
 app.get("/paper",async (req,res)=>{
     let qp = await generateqp()
     cqp = qp;
     res.render("index.ejs", { question: qp })
 })
 
-
 app.post('/modern', (req, res) => {       
-    const sub = req.body.sub;
+    const sub = req.body.sub; 
     if(sub === "Chemistry"){res.redirect("/chem")}
     if(sub === "Applied Mechanics"){res.redirect("/apm")}
     if(sub === "Mathematics-2"){res.redirect("/math")}
+    if(sub === "P.P.S"){res.redirect("/pps")}
 })
 
 app.get("/download", async (req, res)=>{
     let qp = cqp;
     res.render("download.ejs", { question: qp });
 })
+
 app.listen(8080,()=>{
     console.log("LOCAL")
 })
-
-
-

@@ -6,13 +6,11 @@ async function apm(){
     let qp = []
     let a = await Question.find({subject :"Applied Mechanics", chapter: "Unit III", category: 1,})
     let b = await Question.find({subject :"Applied Mechanics", chapter: "Unit III", category: 2,})
-    let c = await Question.find({subject :"Applied Mechanics", chapter: "Unit III", category: 3,})
     let d = await Question.find({subject :"Applied Mechanics", chapter: "Unit IV", category: 1,})
     let e = await Question.find({subject :"Applied Mechanics", chapter: "Unit IV", category: 2,})
-    let f = await Question.find({subject :"Applied Mechanics", chapter: "Unit IV", category: 3,})
     let kc = "a";
 
-    let sets = [a, b, c, d, e, f];
+    let sets = [a, b, d, e];
 
 for (let i = 0; i < sets.length; i++) {
     let l = sets[i].length;
