@@ -1,10 +1,16 @@
 import TeacherNavbar from '../components/TeacherNavbar'
-import TeacherQuestionsPage from './FetchQuestionsPage'
+import FetchQuestionsPage from './FetchQuestionsPage'
+import BulkUploadQuestionsPage from './BulkUploadQuestionsPage'
 import UploadQuestionPage from './UploadQuestionPage'
+import UpdateQuestionsPage from './UpdateQuestionsPage'
+import DeleteQuestionsPage from './DeleteQuestionsPage'
 
 const teacherRoutes = {
   '/teacher/upload-single-question': UploadQuestionPage,
-  '/teacher/fetch-questions': TeacherQuestionsPage,
+  '/teacher/upload-bulk-questions': BulkUploadQuestionsPage,
+  '/teacher/fetch-questions': FetchQuestionsPage,
+  '/teacher/update-questions': UpdateQuestionsPage,
+  '/teacher/delete-questions': DeleteQuestionsPage,
 }
 
 function TeacherSectionPage() {

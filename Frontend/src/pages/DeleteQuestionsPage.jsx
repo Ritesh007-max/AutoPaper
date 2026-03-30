@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getQuestionFilters, getQuestions } from '../api/questions'
+import { deleteQuestion, getQuestionFilters, getQuestions } from '../api/questions'
 import FormField, { baseInputClassName } from '../components/FormField'
 import QuestionCard from '../components/QuestionCard'
 import SectionCard from '../components/SectionCard'
@@ -31,13 +31,14 @@ const uniqueStringValues = (values = []) =>
     ),
   )
 
-function TeacherQuestionsPage() {
+function DeleteQuestionsPage() {
   const [filters, setFilters] = useState(initialFilters)
   const [appliedFilters, setAppliedFilters] = useState(initialFilters)
   const [filterOptions, setFilterOptions] = useState(initialFilterOptions)
   const [questions, setQuestions] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loadingQuestions, setLoadingQuestions] = useState(false)
   const [loadingFilterOptions, setLoadingFilterOptions] = useState(false)
+  const [deletingId, setDeletingId] = useState('')
   const [status, setStatus] = useState({ type: '', message: '' })
 
   useEffect(() => {
@@ -47,10 +48,6 @@ function TeacherQuestionsPage() {
       try {
         const response = await getQuestionFilters()
         const options = response.data?.data ?? {}
-
-        if (!response.data || typeof response.data !== 'object') {
-          throw new Error('Unexpected filters response from server.')
-        }
 
         setFilterOptions({
           subjects: uniqueStringValues(options.subjects).sort((left, right) => left.localeCompare(right)),
@@ -83,13 +80,14 @@ function TeacherQuestionsPage() {
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      setLoading(true)
+      setLoadingQuestions(true)
 
       try {
         const queryParams = Object.entries(appliedFilters).reduce((acc, [key, value]) => {
           if (value !== '') {
             acc[key] = value
           }
+
           return acc
         }, {})
 
@@ -100,12 +98,10 @@ function TeacherQuestionsPage() {
           throw new Error('Unexpected questions response. Check backend route or proxy configuration.')
         }
 
-        const fetchedQuestions = payload.data
-
-        setQuestions(fetchedQuestions)
+        setQuestions(payload.data)
         setStatus({
           type: 'success',
-          message: `Loaded ${fetchedQuestions.length} question(s).`,
+          message: `Loaded ${payload.data.length} question(s) for delete.`,
         })
       } catch (error) {
         setQuestions([])
@@ -114,7 +110,7 @@ function TeacherQuestionsPage() {
           message: error.response?.data?.message ?? error.message ?? 'Failed to fetch questions.',
         })
       } finally {
-        setLoading(false)
+        setLoadingQuestions(false)
       }
     }
 
@@ -140,13 +136,38 @@ function TeacherQuestionsPage() {
     setAppliedFilters((current) => ({ ...current }))
   }
 
+  const handleDelete = async (questionId) => {
+    const confirmation = window.confirm('Delete this question permanently?')
+
+    if (!confirmation) {
+      return
+    }
+
+    setDeletingId(questionId)
+
+    try {
+      await deleteQuestion(questionId)
+      setQuestions((currentQuestions) => currentQuestions.filter((question) => question._id !== questionId))
+      setStatus({ type: 'success', message: 'Question deleted successfully.' })
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message ?? error.message ?? 'Failed to delete question.',
+      })
+    } finally {
+      setDeletingId('')
+    }
+  }
+
   return (
     <div className="grid gap-8 xl:grid-cols-[360px,1fr]">
       <SectionCard>
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Teacher View</p>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Question Bank Filters</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Delete Route</p>
+        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Delete Questions</h1>
 
-        <form className="mt-8 space-y-4" onSubmit={applyFilters}>
+        <StatusBanner status={status} />
+
+        <form className="mt-6 space-y-4" onSubmit={applyFilters}>
           <FormField label="Subject">
             <select
               className={baseInputClassName}
@@ -247,41 +268,44 @@ function TeacherQuestionsPage() {
               Clear
             </button>
           </div>
-
-          {loadingFilterOptions ? (
-            <p className="text-xs text-slate-500">Loading filter values...</p>
-          ) : null}
         </form>
       </SectionCard>
 
       <SectionCard>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Fetched Questions</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">MongoDB Records</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Question List</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-900">Delete Questions From Database</h2>
           </div>
           <button
             className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
             type="button"
             onClick={refreshQuestions}
+            disabled={Boolean(deletingId)}
           >
             Refresh
           </button>
         </div>
 
-        <StatusBanner status={status} />
-
         <div className="mt-6 space-y-4">
-          {loading ? <p className="text-sm text-slate-500">Loading questions...</p> : null}
+          {loadingQuestions ? <p className="text-sm text-slate-500">Loading questions...</p> : null}
 
-          {!loading && questions.length === 0 ? (
+          {deletingId ? (
+            <p className="text-sm text-rose-600">Deleting selected question...</p>
+          ) : null}
+
+          {!loadingQuestions && questions.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500">
               No questions found for selected filters.
             </div>
           ) : null}
 
           {questions.map((question) => (
-            <QuestionCard key={question._id} question={question} />
+            <QuestionCard
+              key={question._id}
+              question={question}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </SectionCard>
@@ -289,4 +313,4 @@ function TeacherQuestionsPage() {
   )
 }
 
-export default TeacherQuestionsPage
+export default DeleteQuestionsPage

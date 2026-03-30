@@ -1,7 +1,10 @@
 function TeacherNavbar() {
   const links = [
     { href: '/teacher/upload-single-question', label: 'Upload Question' },
+    { href: '/teacher/upload-bulk-questions', label: 'Bulk Upload' },
     { href: '/teacher/fetch-questions', label: 'Fetch Questions' },
+    { href: '/teacher/update-questions', label: 'Update Questions' },
+    { href: '/teacher/delete-questions', label: 'Delete Questions' },
   ]
 
   return (

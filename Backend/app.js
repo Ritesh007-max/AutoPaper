@@ -2,26 +2,236 @@ const express = require('express')
 const Question = require('./modles/Questions')
 const app = express()
 app.use(express.json())
+const teacherApiBase = '/api/teacher' 
 
-app.get('/teacher/questions', async (req, res) => {
+const allowedQuestionTypes = ['MCQ', 'short', 'long', 'numerical']
+const allowedDifficulties = ['easy', 'medium', 'hard']
+
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
+
+const normalizeStringValue = (value) => {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  return value.trim()
+}
+
+const buildQuestionPayload = (source = {}) => {
+  const payload = {}
+
+  const textFields = [
+    'questionText',
+    'questionType',
+    'answer',
+    'subject',
+    'chapter',
+    'difficulty',
+  ]
+
+  for (const field of textFields) {
+    if (hasOwn(source, field)) {
+      payload[field] = normalizeStringValue(source[field])
+    }
+  }
+
+  if (hasOwn(source, 'options') && Array.isArray(source.options)) {
+    payload.options = source.options.map((option) => normalizeStringValue(option))
+  }
+
+  const numericFields = ['grade', 'marks']
+
+  for (const field of numericFields) {
+    if (hasOwn(source, field)) {
+      const parsedValue = Number(source[field])
+
+      if (!Number.isNaN(parsedValue)) {
+        payload[field] = parsedValue
+      }
+    }
+  }
+
+  return payload
+}
+
+const parseFiltersFromQuery = (query = {}) => {
+  const filters = {}
+
+  if (query.subject) {
+    filters.subject = String(query.subject).trim()
+  }
+
+  if (query.chapter) {
+    filters.chapter = String(query.chapter).trim()
+  }
+
+  if (query.questionType) {
+    filters.questionType = String(query.questionType).trim()
+  }
+
+  if (query.difficulty) {
+    filters.difficulty = String(query.difficulty).trim()
+  }
+
+  if (query.grade) {
+    const parsedGrade = Number.parseInt(query.grade, 10)
+
+    if (!Number.isNaN(parsedGrade)) {
+      filters.grade = parsedGrade
+    }
+  }
+
+  return filters
+}
+
+const sendServerError = (res, message, error) => {
+  res.status(500).json({
+    success: false,
+    message,
+    error: error.message,
+  })
+}
+
+const sendRequestError = (res, message, error) => {
+  if (error?.name === 'ValidationError' || error?.name === 'CastError') {
+    return res.status(400).json({
+      success: false,
+      message,
+      error: error.message,
+    })
+  }
+
+  return sendServerError(res, message, error)
+}
+
+const createQuestion = async (req, res) => {
+  try {
+    const payload = buildQuestionPayload(req.body)
+    const question = new Question(payload)
+
+    await question.save()
+
+    res.status(201).json({
+      success: true,
+      message: 'Question created successfully',
+      data: question,
+    })
+  } catch (error) {
+    sendRequestError(res, 'Failed to create question', error)
+  }
+}
+
+const createQuestionsBulk = async (req, res) => {
+  try {
+    if (!Array.isArray(req.body) || req.body.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Expected a non-empty array of questions.',
+      })
+    }
+
+    const payload = req.body.map((question) => buildQuestionPayload(question))
+    const createdQuestions = await Question.insertMany(payload)
+
+    res.status(201).json({
+      success: true,
+      message: 'Questions added successfully',
+      count: createdQuestions.length,
+      data: createdQuestions,
+    })
+  } catch (error) {
+    sendRequestError(res, 'Failed to create questions', error)
+  }
+}
+
+const updateQuestion = async (req, res) => {
+  try {
+    const { id } = req.params
+    const updates = buildQuestionPayload(req.body)
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid fields were provided for update.',
+      })
+    }
+
+    const question = await Question.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true },
+    )
+
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found.',
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Question updated successfully',
+      data: question,
+    })
+  } catch (error) {
+    sendRequestError(res, 'Failed to update question', error)
+  }
+}
+
+const deleteQuestion = async (req, res) => {
+  try {
+    const { id } = req.params
+    const question = await Question.findByIdAndDelete(id)
+
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found.',
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Question deleted successfully',
+      data: question,
+    })
+  } catch (error) {
+    sendRequestError(res, 'Failed to delete question', error)
+  }
+}
+
+app.get(`${teacherApiBase}/questions`, async (req, res) => {
 
   try {
-    const { subject, chapter, questionType, difficulty, grade } = req.query
+    const filters = parseFiltersFromQuery(req.query)
+    let query = Question.find(filters)
 
-    const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 10
+    const hasLimit = hasOwn(req.query, 'limit') && req.query.limit !== ''
+    const hasPage = hasOwn(req.query, 'page') && req.query.page !== ''
 
-    const skip = (page - 1) * limit;
+    if (hasLimit) {
+      const page = hasPage ? Number.parseInt(req.query.page, 10) : 1
+      const limit = Number.parseInt(req.query.limit, 10)
 
-    const filters = {}
+      if (!Number.isInteger(page) || page < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'page must be an integer greater than or equal to 1.',
+        })
+      }
 
-    if (subject) filters.subject = subject
-    if (chapter) filters.chapter = chapter
-    if (questionType) filters.questionType = questionType
-    if (difficulty) filters.difficulty = difficulty
-    if (grade) filters.grade = parseInt(grade)
+      if (!Number.isInteger(limit) || limit < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'limit must be an integer greater than or equal to 1.',
+        })
+      }
 
-    const questions = await Question.find(filters).skip(skip).limit(limit)
+      query = query.skip((page - 1) * limit).limit(limit)
+    }
+
+    const questions = await query
     res.status(200).json({
       success: true,
       count: questions.length,
@@ -30,91 +240,58 @@ app.get('/teacher/questions', async (req, res) => {
 
   }
   catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch questions',
-      error: error.message,
-    })
+    sendServerError(res, 'Failed to fetch questions', error)
   }
 })
 
-app.post('/teacher/addQuestion', async (req, res) => {
+app.get(`${teacherApiBase}/questions/filters`, async (req, res) => {
   try {
-    const { questionText, questionType, options, answer, subject, chapter, grade, difficulty, marks } = req.body
+    const [subjects, chapters, grades, questionTypes, difficulties] = await Promise.all([
+      Question.distinct('subject'),
+      Question.distinct('chapter'),
+      Question.distinct('grade'),
+      Question.distinct('questionType'),
+      Question.distinct('difficulty'),
+    ])
 
-    const question = new Question({ questionText, questionType, options, answer, subject, chapter, grade, difficulty, marks })
+    const filterStringValues = (values) =>
+      values
+        .map((value) => normalizeStringValue(value))
+        .filter((value) => typeof value === 'string' && value.length > 0)
 
-    await question.save()
-    res.status(201).json(question)
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create question',
-      error: error.message,
-    })
-  }
-})
+    const sortedSubjects = filterStringValues(subjects).sort((left, right) => left.localeCompare(right))
+    const sortedChapters = filterStringValues(chapters).sort((left, right) => left.localeCompare(right))
+    const sortedGrades = grades
+      .map((grade) => Number(grade))
+      .filter((grade) => !Number.isNaN(grade))
+      .sort((left, right) => left - right)
 
-app.post('/teacher/addQuestions', async (req, res) => {
-  try {
+    const sortedQuestionTypes = Array.from(
+      new Set([...allowedQuestionTypes, ...filterStringValues(questionTypes)]),
+    )
+    const sortedDifficulties = Array.from(
+      new Set([...allowedDifficulties, ...filterStringValues(difficulties)]),
+    )
 
-    await Question.insertMany(req.body)
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: 'Questions added successfully',
-      data: req.body,
+      data: {
+        subjects: sortedSubjects,
+        chapters: sortedChapters,
+        grades: sortedGrades,
+        questionTypes: sortedQuestionTypes,
+        difficulties: sortedDifficulties,
+      },
     })
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create question',
-      error: error.message,
-    })
+    sendServerError(res, 'Failed to fetch question filters', error)
   }
 })
 
-app.put('/teacher/updateQuestion/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-
-    const { questionText, questionType, options, answer, subject, chapter, grade, difficulty, marks } = req.body
-
-    const filters = {}
-
-    if (questionText) filters.questionText = questionText
-    if (questionType) filters.questionType = questionType
-    if (options) filters.options = options
-    if (answer) filters.answer = answer
-    if (subject) filters.subject = subject
-    if (chapter) filters.chapter = chapter
-    if (grade) filters.grade = parseInt(grade)
-    if (difficulty) filters.difficulty = difficulty
-    if (marks) filters.marks = parseInt(marks)
-
-    const question = await Question.findByIdAndUpdate(id, filters, { returnDocument: 'after' })
-    res.status(200).json(question)
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update question',
-      error: error.message,
-    })
-  }
-})
-
-app.delete('/teacher/deleteQuestion/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-
-    const question = await Question.findByIdAndDelete(id)
-    res.status(200).json(question)
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete question',
-      error: error.message,
-    })
-  }
-})
+app.post(`${teacherApiBase}/questions`, createQuestion)
+app.post(`${teacherApiBase}/questions/bulk`, createQuestionsBulk)
+app.put(`${teacherApiBase}/questions/:id`, updateQuestion)
+app.patch(`${teacherApiBase}/questions/:id`, updateQuestion)
+app.delete(`${teacherApiBase}/questions/:id`, deleteQuestion)
 
 module.exports = app

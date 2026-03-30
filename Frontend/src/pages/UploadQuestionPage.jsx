@@ -3,7 +3,7 @@ import { createQuestion } from '../api/questions'
 import QuestionForm from '../components/QuestionForm'
 import QuestionExamples from '../components/QuestionExamples'
 import SectionCard from '../components/SectionCard'
-import { emptyForm } from '../constants/questionForm'
+import { difficultyOptions, emptyForm, questionTypeOptions } from '../constants/questionForm'
 import StatusBanner from '../components/StatusBanner'
 
 function UploadQuestionPage() {
@@ -40,10 +40,62 @@ function UploadQuestionPage() {
     }
   }
 
+  const validatePayload = (payload) => {
+    if (!payload.questionText) {
+      return 'Question text is required.'
+    }
+
+    if (!questionTypeOptions.includes(payload.questionType)) {
+      return 'Please select a valid question type.'
+    }
+
+    if (!difficultyOptions.includes(payload.difficulty)) {
+      return 'Please select a valid difficulty.'
+    }
+
+    if (!payload.subject) {
+      return 'Subject is required.'
+    }
+
+    if (!payload.answer) {
+      return 'Answer is required.'
+    }
+
+    if (!Number.isInteger(payload.grade) || payload.grade < 1) {
+      return 'Grade must be a whole number greater than or equal to 1.'
+    }
+
+    if (!Number.isInteger(payload.marks) || payload.marks < 1) {
+      return 'Marks must be a whole number greater than or equal to 1.'
+    }
+
+    if (payload.questionType === 'MCQ') {
+      if (payload.options.length < 2) {
+        return 'MCQ requires at least two options.'
+      }
+
+      const hasAnswerInOptions = payload.options.some(
+        (option) => option.toLowerCase() === payload.answer.toLowerCase(),
+      )
+
+      if (!hasAnswerInOptions) {
+        return 'For MCQ, answer must match one of the options.'
+      }
+    }
+
+    return ''
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
 
     const payload = buildPayload()
+    const validationError = validatePayload(payload)
+
+    if (validationError) {
+      setStatus({ type: 'error', message: validationError })
+      return
+    }
 
     try {
       await createQuestion(payload)

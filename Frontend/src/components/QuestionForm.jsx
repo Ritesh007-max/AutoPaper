@@ -115,6 +115,7 @@ function QuestionForm({ form, onChange, onReset, onSubmit }) {
             value={form.optionsText}
             onChange={onChange}
             placeholder="One option per line"
+            required
           />
         </FormField>
       ) : null}
