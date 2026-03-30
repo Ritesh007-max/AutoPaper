@@ -33,8 +33,11 @@ main().then(()=>{
 })
 
 async function main(){
-    await mongoose.disconnect();
-    await mongoose.connect("mongodb://localhost:27017/autopap")
+    await mongoose.connect(process.env.MONGODB_URI, { dbName: 'autopaper' })
+    console.log("DB Name:", mongoose.connection.db.databaseName);
+    console.log("Host:", mongoose.connection.host);
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log("Collections:", collections.map(c => c.name));
 }
 
 app.use("/", home);
@@ -87,6 +90,7 @@ app.get("/download", async (req, res)=>{
     res.render("download.ejs", { question: qp });
 })
 
-app.listen(8080,()=>{
-    console.log("LOCAL")
+const PORT = process.env.PORT || 8080
+app.listen(PORT, ()=>{
+    console.log(`Running on port ${PORT}`)
 })
