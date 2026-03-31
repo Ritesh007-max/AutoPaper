@@ -110,9 +110,24 @@ function UploadQuestionPage() {
   }
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[420px,1fr]">
+    <div className="grid gap-5 xl:grid-cols-[1.35fr,1fr]">
       <SectionCard>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Upload Single Question</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Question Bank</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Create New Question</h1>
+            <p className="mt-2 text-sm text-slate-600">
+              Configure your question with rich text style fields and metadata.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700"
+          >
+            Generate with AI (Soon)
+          </button>
+        </div>
 
         <StatusBanner status={status} />
 

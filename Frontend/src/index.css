@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+:root {
+  --tp-primary: #3B82F6;
+  --tp-primary-strong: #2563EB;
+  --tp-primary-soft: #EFF6FF;
+  --tp-secondary: #F8FAFC;
+  --tp-text: #1F2937;
+  --tp-text-muted: #6B7280;
+  --tp-border: #E2E8F0;
+  --tp-surface: #F8FAFC;
+  --tp-card: #FFFFFF;
+}
+
 html,
 body,
 #root {
@@ -8,9 +20,17 @@ body,
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top, rgba(34, 197, 94, 0.16), transparent 32%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-  color: #0f172a;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--tp-surface);
+  color: var(--tp-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Custom shadow for cards */
+.shadow-soft {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+}
+
+.shadow-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
 }

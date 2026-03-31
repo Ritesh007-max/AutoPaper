@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { getQuestionFilters, getQuestions, patchQuestion } from '../api/questions'
-import FormField, { baseInputClassName } from '../components/FormField'
+import FormField from '../components/FormField'
 import QuestionCard from '../components/QuestionCard'
 import SectionCard from '../components/SectionCard'
 import StatusBanner from '../components/StatusBanner'
+import { baseInputClassName } from '../components/formStyles'
 import { difficultyOptions, questionTypeOptions } from '../constants/questionForm'
 
 const initialFilters = {
@@ -297,14 +298,14 @@ function UpdateQuestionsPage() {
   }
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[420px,1fr]">
+    <div className="grid gap-5 xl:grid-cols-[1fr,1.15fr]">
       <SectionCard>
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Update Route</p>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Update Questions</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Update Route</p>
+        <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900">Update Questions</h1>
 
         <StatusBanner status={status} />
 
-        <form className="mt-6 space-y-4" onSubmit={applyFilters}>
+        <form className="mt-5 space-y-3.5" onSubmit={applyFilters}>
           <FormField label="Subject">
             <select
               className={baseInputClassName}
@@ -394,13 +395,13 @@ function UpdateQuestionsPage() {
 
           <div className="flex gap-3 pt-2">
             <button
-              className="flex-1 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+              className="flex-1 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
               type="submit"
             >
               Apply Filters
             </button>
             <button
-              className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
               type="button"
               onClick={clearFilters}
             >
@@ -410,8 +411,8 @@ function UpdateQuestionsPage() {
         </form>
 
         {editingQuestionId ? (
-          <form className="mt-8 space-y-4 border-t border-slate-200 pt-6" onSubmit={saveEditedQuestion}>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Edit Form</p>
+          <form className="mt-6 space-y-3.5 border-t border-slate-200 pt-5" onSubmit={saveEditedQuestion}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Edit Form</p>
 
             <FormField label="Question text">
               <textarea
@@ -524,14 +525,14 @@ function UpdateQuestionsPage() {
 
             <div className="flex flex-wrap gap-3 pt-2">
               <button
-                className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                 type="submit"
                 disabled={saving}
               >
                 {saving ? 'Saving Changes...' : 'Save Changes'}
               </button>
               <button
-                className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
                 type="button"
                 onClick={cancelEdit}
                 disabled={saving}
@@ -541,7 +542,7 @@ function UpdateQuestionsPage() {
             </div>
           </form>
         ) : (
-          <div className="mt-8 rounded-2xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">
+          <div className="mt-6 rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">
             Select a question from the list to load it into the update form.
           </div>
         )}
@@ -550,11 +551,11 @@ function UpdateQuestionsPage() {
       <SectionCard>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Question List</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Question List</p>
             <h2 className="mt-2 text-2xl font-black text-slate-900">Click Edit On Any Question</h2>
           </div>
           <button
-            className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+            className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
             type="button"
             onClick={refreshQuestions}
           >
@@ -566,7 +567,7 @@ function UpdateQuestionsPage() {
           {loadingQuestions ? <p className="text-sm text-slate-500">Loading questions...</p> : null}
 
           {!loadingQuestions && questions.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500">
+            <div className="rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500">
               No questions found for selected filters.
             </div>
           ) : null}

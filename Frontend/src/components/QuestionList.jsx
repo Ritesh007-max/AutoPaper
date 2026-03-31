@@ -10,7 +10,7 @@ function QuestionList({ loading, onDelete, onEdit, onRefresh, questions, status 
           <h2 className="mt-2 text-2xl font-black text-slate-900">MongoDB Records</h2>
         </div>
         <button
-          className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+          className="rounded-full bg-[var(--tp-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--tp-primary-strong)]"
           type="button"
           onClick={onRefresh}
         >
