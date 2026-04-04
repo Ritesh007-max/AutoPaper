@@ -287,6 +287,7 @@ export function InviteTable({ invites, loading = false, error = '', onResend, re
           <div key={invite.id} className="grid grid-cols-[1.6fr,0.8fr,0.8fr] gap-4 px-5 py-4">
             <div>
               <p className="text-sm font-bold text-slate-900">{invite.email}</p>
+              {invite.teacherUid ? <p className="mt-1 text-xs text-slate-500">Teacher UID: {invite.teacherUid}</p> : null}
               <p className="mt-1 text-xs text-slate-500">
                 {invite.expiresAtLabel ? `Expires ${invite.expiresAtLabel}` : 'No expiry set'}
               </p>

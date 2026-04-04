@@ -4,6 +4,8 @@ const instituteInviteSchema = new mongoose.Schema({
   institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
   institutionUid: { type: String },
   email: { type: String, required: true, trim: true },
+  name: { type: String, trim: true },
+  teacherUid: { type: String, trim: true },
   status: {
     type: String,
     enum: ['pending', 'accepted', 'expired'],

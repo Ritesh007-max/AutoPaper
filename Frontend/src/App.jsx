@@ -9,6 +9,7 @@ function App() {
     pathname === '/institute' ||
     pathname.startsWith('/institute/') ||
     pathname === '/teachers' ||
+    pathname === '/teachers/invite' ||
     pathname === '/activity' ||
     pathname === '/invites'
   const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')

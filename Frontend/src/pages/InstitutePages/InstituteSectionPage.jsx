@@ -8,6 +8,8 @@ const instituteRoutes = {
   '/institute/dashboard': { key: 'dashboard', component: InstituteDashboard },
   '/teachers': { key: 'teachers', component: InstituteTeachersPage },
   '/institute/teachers': { key: 'teachers', component: InstituteTeachersPage },
+  '/teachers/invite': { key: 'invites', component: InstituteInvitesPage },
+  '/institute/teachers/invite': { key: 'invites', component: InstituteInvitesPage },
   '/activity': { key: 'activity', component: InstituteActivityPage },
   '/institute/activity': { key: 'activity', component: InstituteActivityPage },
   '/invites': { key: 'invites', component: InstituteInvitesPage },

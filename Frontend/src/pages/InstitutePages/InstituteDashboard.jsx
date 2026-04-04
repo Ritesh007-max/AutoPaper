@@ -79,7 +79,7 @@ const statCardMeta = [
 
 const quickActions = [
   {
-    href: '/teachers',
+    href: '/teachers/invite',
     label: 'Invite Teacher',
     description: 'Send or manage teacher invitations',
     tone: 'sky',

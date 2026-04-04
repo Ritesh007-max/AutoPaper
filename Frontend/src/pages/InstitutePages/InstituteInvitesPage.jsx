@@ -10,10 +10,27 @@ import {
 } from '../../api/institute'
 import { formatNumber, formatShortDate } from '../../utils/instituteFormatters'
 
+const INSTITUTE_UID_STORAGE_KEY = 'autoPaper.institutionUid'
+
 const initialState = {
   loading: true,
   error: '',
   data: [],
+}
+
+const getInitialInstitutionUid = () => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+
+  const searchParams = new URLSearchParams(window.location.search)
+  const fromQuery = searchParams.get('institutionUid')?.trim()
+
+  if (fromQuery) {
+    return fromQuery
+  }
+
+  return window.localStorage.getItem(INSTITUTE_UID_STORAGE_KEY)?.trim() || ''
 }
 
 const defaultTeacherForm = {
@@ -21,12 +38,14 @@ const defaultTeacherForm = {
   email: '',
   password: '',
   role: 'teacher',
-  institutionUid: '',
+  institutionUid: getInitialInstitutionUid(),
 }
 
 const normalizeInvite = (invite = {}) => ({
   id: invite.id || invite._id || invite.email || crypto.randomUUID(),
+  name: invite.name || '',
   email: invite.email || '',
+  teacherUid: invite.teacherUid || '',
   status: invite.status || 'pending',
   resendCount: Number(invite.resendCount) || 0,
   lastSentAt: invite.lastSentAt || null,
@@ -34,12 +53,22 @@ const normalizeInvite = (invite = {}) => ({
   expiresAtLabel: formatShortDate(invite.expiresAt),
 })
 
+const deriveTeacherUidBase = (institutionUid = '') => {
+  const normalized = String(institutionUid || '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(-8)
+    .toUpperCase()
+
+  return normalized || 'AUTO'
+}
+
 function InstituteInvitesPage() {
   const [state, setState] = useState(initialState)
   const [resendingInviteId, setResendingInviteId] = useState('')
   const [teacherForm, setTeacherForm] = useState(defaultTeacherForm)
   const [teacherFormStatus, setTeacherFormStatus] = useState({ type: '', message: '' })
   const [teacherAction, setTeacherAction] = useState('')
+  const teacherUidPreview = `${deriveTeacherUidBase(teacherForm.institutionUid)}-XXXXXX`
 
   const loadInvites = async () => {
     setState((current) => ({
@@ -48,7 +77,8 @@ function InstituteInvitesPage() {
     }))
 
     try {
-      const response = await getInstituteInvites()
+      const institutionUid = teacherForm.institutionUid.trim()
+      const response = await getInstituteInvites(institutionUid ? { institutionUid } : undefined)
       const payload = response.data?.data
       const invites = Array.isArray(payload) ? payload.map(normalizeInvite) : []
 
@@ -70,6 +100,16 @@ function InstituteInvitesPage() {
     loadInvites()
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    if (teacherForm.institutionUid) {
+      window.localStorage.setItem(INSTITUTE_UID_STORAGE_KEY, teacherForm.institutionUid)
+    }
+  }, [teacherForm.institutionUid])
+
   const handleTeacherFormChange = (event) => {
     const { name, value } = event.target
     setTeacherForm((current) => ({
@@ -79,13 +119,17 @@ function InstituteInvitesPage() {
   }
 
   const resetTeacherForm = () => {
-    setTeacherForm(defaultTeacherForm)
+    setTeacherForm({
+      ...defaultTeacherForm,
+      institutionUid: getInitialInstitutionUid(),
+    })
   }
 
   const submitTeacherForm = async (sendEmail) => {
     const payload = {
       ...teacherForm,
       role: 'teacher',
+      institutionUid: teacherForm.institutionUid.trim(),
       sendEmail,
     }
 
@@ -147,20 +191,13 @@ function InstituteInvitesPage() {
 
     try {
       await resendInstituteInvite(invite.id)
-
-      setState((current) => ({
-        ...current,
-        data: current.data.map((row) => (
-          row.id === invite.id
-            ? { ...row, resendCount: row.resendCount + 1, lastSentAt: new Date().toISOString() }
-            : row
-        )),
-      }))
-    } catch {
-      setState((current) => ({
-        ...current,
-        error: 'Unable to resend the invite right now.',
-      }))
+      await loadInvites()
+      setTeacherFormStatus({ type: 'success', message: 'Teacher invite resent successfully.' })
+    } catch (error) {
+      setTeacherFormStatus({
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Failed to resend invite.',
+      })
     } finally {
       setResendingInviteId('')
     }
@@ -171,8 +208,8 @@ function InstituteInvitesPage() {
   return (
     <InstituteLayout
       activeKey="invites"
-      title="Invites"
-      description="Manage pending, accepted, and expired invitations without mixing this flow with teacher routes."
+      title="Invite Teachers"
+      description="Create a teacher record, send the login email, and keep the invite queue visible in one place."
     >
       <div className="space-y-6">
         <section className="grid gap-6 xl:grid-cols-[0.92fr,1.08fr]">
@@ -240,10 +277,11 @@ function InstituteInvitesPage() {
                   value={teacherForm.institutionUid}
                   onChange={handleTeacherFormChange}
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
-                  placeholder="Enter institute UID"
+                  placeholder="Enter or auto-fill institute UID"
                 />
-                <p className="text-xs text-slate-500">
-                  The teacher UID will be derived from this institute UID.
+                <p className="text-xs text-slate-500">The teacher UID is derived from this institute UID on the server.</p>
+                <p className="text-xs font-semibold text-slate-700">
+                  Derived UID preview: <span className="font-black text-slate-900">{teacherUidPreview}</span>
                 </p>
               </label>
 
