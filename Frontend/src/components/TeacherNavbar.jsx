@@ -8,7 +8,7 @@ function TeacherNavbar() {
   ]
 
   return (
-    <nav className="rounded-[2rem] border border-white/60 bg-white/85 p-4 shadow-2xl shadow-slate-900/10 backdrop-blur md:p-5b width-half">
+    <nav className="rounded-[2rem] border border-white/60 bg-white/85 p-4 shadow-2xl shadow-slate-900/10 backdrop-blur md:p-5">
       <div className="flex flex-wrap items-center gap-3">
         <p className="mr-2 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Teacher Section</p>
         {links.map((link) => (

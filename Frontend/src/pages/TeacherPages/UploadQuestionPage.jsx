@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { createQuestion } from '../api/questions'
-import QuestionForm from '../components/QuestionForm'
-import QuestionExamples from '../components/QuestionExamples'
-import SectionCard from '../components/SectionCard'
-import { difficultyOptions, emptyForm, questionTypeOptions } from '../constants/questionForm'
-import StatusBanner from '../components/StatusBanner'
+﻿import { useState } from 'react'
+import { createQuestion } from '../../api/questions'
+import QuestionForm from '../../components/QuestionForm'
+import QuestionExamples from '../../components/QuestionExamples'
+import SectionCard from '../../components/SectionCard'
+import { difficultyOptions, emptyForm, questionTypeOptions } from '../../constants/questionForm'
+import StatusBanner from '../../components/StatusBanner'
 
 function UploadQuestionPage() {
   const [form, setForm] = useState(emptyForm)
@@ -147,3 +147,5 @@ function UploadQuestionPage() {
 }
 
 export default UploadQuestionPage
+
+

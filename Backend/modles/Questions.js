@@ -11,7 +11,8 @@ const questionSchema = new mongoose.Schema({
   difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
   marks: { type: Number, required: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' }
+  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
+  institutionUid: { type: String },
 }, {
   timestamps: true,
 })

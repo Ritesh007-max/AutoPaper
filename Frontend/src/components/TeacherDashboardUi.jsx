@@ -126,12 +126,12 @@ export function TeacherSidebar({ navItems, activeKey }) {
       {/* User info */}
       <div className="border-t border-slate-100 p-4">
         <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3">
-          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-orange-100 flex items-center justify-center">
-             <span className="text-orange-600 font-bold text-sm">AT</span>
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-100">
+            <span className="text-sm font-bold text-orange-600">AP</span>
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="truncate text-sm font-bold text-slate-900">Dr. Aris Thorne</p>
-            <p className="truncate text-xs font-medium text-slate-500">Senior Educator</p>
+            <p className="truncate text-sm font-bold text-slate-900">Active workspace</p>
+            <p className="truncate text-xs font-medium text-slate-500">Connected teacher profile</p>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ export function DashboardStatCard({ title, value, icon, trend, iconBg, trendUp =
 }
 
 export function StatusBadge({ status }) {
-  const published = status.toLowerCase() === 'published'
+  const published = String(status || '').toLowerCase() === 'published'
   return (
     <span className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest ${
       published 
@@ -237,7 +237,7 @@ export function RecentPaperRow({ name, timestamp, subject, status }) {
   )
 }
 
-export function ActionCard({ icon, label, href, iconBg, delay }) {
+export function ActionCard({ icon, label, href, iconBg }) {
   return (
     <a 
       href={href}

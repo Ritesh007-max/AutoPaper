@@ -1,4 +1,4 @@
-import FetchQuestionsPage from './FetchQuestionsPage'
+﻿import FetchQuestionsPage from './FetchQuestionsPage'
 import BulkUploadQuestionsPage from './BulkUploadQuestionsPage'
 import UploadQuestionPage from './UploadQuestionPage'
 import UpdateQuestionsPage from './UpdateQuestionsPage'
@@ -6,7 +6,7 @@ import DeleteQuestionsPage from './DeleteQuestionsPage'
 import TeacherDashboardPage from './TeacherDashboardPage'
 import TeacherSettingsPage from './TeacherSettingsPage'
 import TeacherHistoryPage from './TeacherHistoryPage'
-import TeacherLayout from '../components/TeacherLayout'
+import TeacherLayout from '../../components/TeacherLayout'
 
 const teacherRoutes = {
   '/teacher': { key: 'dashboard', component: TeacherDashboardPage },
@@ -46,3 +46,5 @@ function TeacherSectionPage() {
 }
 
 export default TeacherSectionPage
+
+
