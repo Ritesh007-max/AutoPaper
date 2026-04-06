@@ -5,6 +5,21 @@ const allowedDifficulties = ['easy', 'medium', 'hard']
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
 
+const getScopedInstitutionUid = (req) => String(req.user?.institutionUid || '').trim()
+
+const requireInstitutionScope = (res, institutionUid) => {
+  if (institutionUid) {
+    return true
+  }
+
+  res.status(403).json({
+    success: false,
+    message: 'Institution scope is required for teacher access.',
+  })
+
+  return false
+}
+
 const normalizeStringValue = (value) => {
   if (typeof value !== 'string') {
     return value
@@ -33,7 +48,9 @@ const buildQuestionPayload = (source = {}) => {
   }
 
   if (hasOwn(source, 'options') && Array.isArray(source.options)) {
-    payload.options = source.options.map((option) => normalizeStringValue(option))
+    payload.options = source.options
+      .map((option) => normalizeStringValue(option))
+      .filter((option) => typeof option === 'string' && option.length > 0)
   }
 
   const numericFields = ['grade', 'marks']
@@ -49,6 +66,57 @@ const buildQuestionPayload = (source = {}) => {
   }
 
   return payload
+}
+
+const validateQuestionPayload = (payload = {}) => {
+  const errors = []
+
+  const requiredTextFields = ['questionText', 'questionType', 'subject', 'difficulty']
+
+  for (const field of requiredTextFields) {
+    if (!String(payload[field] || '').trim()) {
+      errors.push(`${field} is required.`)
+    }
+  }
+
+  if (!Number.isInteger(payload.grade) || payload.grade < 1) {
+    errors.push('grade must be an integer greater than or equal to 1.')
+  }
+
+  if (!Number.isInteger(payload.marks) || payload.marks < 1) {
+    errors.push('marks must be an integer greater than or equal to 1.')
+  }
+
+  if (payload.questionType && !allowedQuestionTypes.includes(payload.questionType)) {
+    errors.push(`questionType must be one of ${allowedQuestionTypes.join(', ')}.`)
+  }
+
+  if (payload.difficulty && !allowedDifficulties.includes(payload.difficulty)) {
+    errors.push(`difficulty must be one of ${allowedDifficulties.join(', ')}.`)
+  }
+
+  if (payload.questionType === 'MCQ') {
+    if (!String(payload.answer || '').trim()) {
+      errors.push('answer is required for MCQ questions.')
+    }
+
+    if (!Array.isArray(payload.options) || payload.options.length < 2) {
+      errors.push('MCQ questions must include at least two options.')
+    }
+
+    if (String(payload.answer || '').trim() && Array.isArray(payload.options) && payload.options.length > 0) {
+      const normalizedAnswer = String(payload.answer || '').trim().toLowerCase()
+      const hasMatchingAnswer = payload.options.some(
+        (option) => String(option || '').trim().toLowerCase() === normalizedAnswer,
+      )
+
+      if (!hasMatchingAnswer) {
+        errors.push('MCQ answer must match one of the provided options.')
+      }
+    }
+  }
+
+  return errors
 }
 
 const parseFiltersFromQuery = (query = {}) => {
@@ -104,7 +172,13 @@ const sendRequestError = (res, message, error) => {
 const getQuestions = async (req, res) => {
   try {
     const filters = parseFiltersFromQuery(req.query)
-    let query = Question.find(filters).sort({ createdAt: -1 })
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    let query = Question.find({ institutionUid, ...filters }).sort({ createdAt: -1 })
 
     const hasLimit = hasOwn(req.query, 'limit') && req.query.limit !== ''
     const hasPage = hasOwn(req.query, 'page') && req.query.page !== ''
@@ -144,12 +218,18 @@ const getQuestions = async (req, res) => {
 
 const getQuestionFilters = async (req, res) => {
   try {
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
     const [subjects, chapters, grades, questionTypes, difficulties] = await Promise.all([
-      Question.distinct('subject'),
-      Question.distinct('chapter'),
-      Question.distinct('grade'),
-      Question.distinct('questionType'),
-      Question.distinct('difficulty'),
+      Question.distinct('subject', { institutionUid }),
+      Question.distinct('chapter', { institutionUid }),
+      Question.distinct('grade', { institutionUid }),
+      Question.distinct('questionType', { institutionUid }),
+      Question.distinct('difficulty', { institutionUid }),
     ])
 
     const filterStringValues = (values) =>
@@ -188,7 +268,25 @@ const getQuestionFilters = async (req, res) => {
 
 const createQuestion = async (req, res) => {
   try {
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
     const payload = buildQuestionPayload(req.body)
+    payload.institutionUid = institutionUid
+    payload.createdBy = req.user.userId
+    const validationErrors = validateQuestionPayload(payload)
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question validation failed.',
+        errors: validationErrors,
+      })
+    }
+
     const question = new Question(payload)
 
     await question.save()
@@ -205,6 +303,12 @@ const createQuestion = async (req, res) => {
 
 const createQuestionsBulk = async (req, res) => {
   try {
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
     if (!Array.isArray(req.body) || req.body.length === 0) {
       return res.status(400).json({
         success: false,
@@ -212,7 +316,23 @@ const createQuestionsBulk = async (req, res) => {
       })
     }
 
-    const payload = req.body.map((question) => buildQuestionPayload(question))
+    const payload = req.body.map((question) => ({
+      ...buildQuestionPayload(question),
+      institutionUid,
+      createdBy: req.user.userId,
+    }))
+    const validationErrors = payload.flatMap((question, index) =>
+      validateQuestionPayload(question).map((error) => `Question ${index + 1}: ${error}`),
+    )
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question validation failed.',
+        errors: validationErrors,
+      })
+    }
+
     const createdQuestions = await Question.insertMany(payload)
 
     return res.status(201).json({
@@ -229,7 +349,14 @@ const createQuestionsBulk = async (req, res) => {
 const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
     const updates = buildQuestionPayload(req.body)
+    const validationErrors = validateQuestionPayload(updates)
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({
@@ -238,8 +365,16 @@ const updateQuestion = async (req, res) => {
       })
     }
 
-    const question = await Question.findByIdAndUpdate(
-      id,
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question validation failed.',
+        errors: validationErrors,
+      })
+    }
+
+    const question = await Question.findOneAndUpdate(
+      { _id: id, institutionUid },
       { $set: updates },
       { new: true, runValidators: true },
     )
@@ -264,7 +399,13 @@ const updateQuestion = async (req, res) => {
 const deleteQuestion = async (req, res) => {
   try {
     const { id } = req.params
-    const question = await Question.findByIdAndDelete(id)
+    const institutionUid = getScopedInstitutionUid(req)
+
+    if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    const question = await Question.findOneAndDelete({ _id: id, institutionUid })
 
     if (!question) {
       return res.status(404).json({

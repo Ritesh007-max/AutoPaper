@@ -23,25 +23,34 @@ function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, descri
               </div>
             </div>
 
-            <nav className="flex flex-wrap gap-2">
-              {navItems.map((item) => {
-                const active = item.key === activeKey
+            <div className="flex flex-wrap items-center gap-2">
+              <nav className="flex flex-wrap gap-2">
+                {navItems.map((item) => {
+                  const active = item.key === activeKey
 
-                return (
-                  <a
-                    key={item.key}
-                    href={item.href}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      active
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                )
-              })}
-            </nav>
+                  return (
+                    <a
+                      key={item.key}
+                      href={item.href}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        active
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  )
+                })}
+              </nav>
+
+              <a
+                href="/logout"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+              >
+                Logout
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

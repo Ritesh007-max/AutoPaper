@@ -1,4 +1,5 @@
 const express = require('express')
+const { authenticateToken, authorizeRoles } = require('../middleware/auth')
 const {
   createTeacher,
   getActivity,
@@ -9,6 +10,8 @@ const {
 } = require('../controllers/instituteController')
 
 const router = express.Router()
+
+router.use(authenticateToken, authorizeRoles('instituteAdmin'))
 
 router.get('/dashboard-stats', getDashboardStats)
 router.get('/activity', getActivity)

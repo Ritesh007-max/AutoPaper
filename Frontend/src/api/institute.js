@@ -1,8 +1,6 @@
-import axios from 'axios'
+import { createApiClient } from './client'
 
-const api = axios.create({
-  baseURL: '/api/institute',
-})
+const api = createApiClient('/api/institute')
 
 export const getInstituteDashboardStats = (params) => api.get('/dashboard-stats', { params })
 

@@ -1,4 +1,5 @@
 const express = require('express')
+const { authenticateToken, authorizeRoles } = require('../middleware/auth')
 const {
   createQuestion,
   createQuestionsBulk,
@@ -9,6 +10,8 @@ const {
 } = require('../controllers/teacherController')
 
 const router = express.Router()
+
+router.use(authenticateToken, authorizeRoles('teacher'))
 
 router.get('/questions', getQuestions)
 router.get('/questions/filters', getQuestionFilters)

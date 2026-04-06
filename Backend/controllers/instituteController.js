@@ -5,6 +5,8 @@ const InstituteInvite = require('../modles/InstituteInvite')
 const { generateTeacherUid, normalizeUidBase } = require('../utils/institutionUid')
 const { sendTeacherInvitationEmail } = require('../utils/teacherInvitationMailer')
 
+const getScopedInstitutionUid = (req) => String(req.user?.institutionUid || '').trim()
+
 const parseLimit = (value, fallback) => {
   const parsed = Number.parseInt(value, 10)
 
@@ -45,8 +47,8 @@ const newestDate = (...values) => {
   return new Date(Math.max(...dates.map((date) => date.getTime())))
 }
 
-const loadInstituteData = async (institutionId = '') => {
-  const filter = institutionId ? { $or: [{ institutionId }, { institutionUid: institutionId }] } : {}
+const loadInstituteData = async (institutionUid = '') => {
+  const filter = institutionUid ? { institutionUid } : {}
 
     const [teachers, questions, activities, invites] = await Promise.all([
     User.find({ role: 'teacher', ...filter }).select('name email teacherUid inviteStatus inviteSentAt createdAt updatedAt institutionId institutionUid').lean(),
@@ -214,7 +216,8 @@ const buildInviteRows = (invites) =>
 
 const getDashboardStats = async (req, res) => {
   try {
-    const data = await loadInstituteData(req.query.institutionId || req.query.institutionUid || '')
+    const institutionUid = getScopedInstitutionUid(req)
+    const data = await loadInstituteData(institutionUid)
 
     return res.status(200).json({
       success: true,
@@ -232,7 +235,8 @@ const getDashboardStats = async (req, res) => {
 const getActivity = async (req, res) => {
   try {
     const limit = parseLimit(req.query.limit, 8)
-    const data = await loadInstituteData(req.query.institutionId || req.query.institutionUid || '')
+    const institutionUid = getScopedInstitutionUid(req)
+    const data = await loadInstituteData(institutionUid)
 
     const feed = buildActivityFeed(data.teachers, data.questions, data.activities, data.invites)
 
@@ -253,7 +257,8 @@ const getActivity = async (req, res) => {
 const getTeachers = async (req, res) => {
   try {
     const limit = parseLimit(req.query.limit, 5)
-    const data = await loadInstituteData(req.query.institutionId || req.query.institutionUid || '')
+    const institutionUid = getScopedInstitutionUid(req)
+    const data = await loadInstituteData(institutionUid)
 
     const teachers = mapTeacherData(data.teachers, data.questions, data.activities)
 
@@ -276,18 +281,15 @@ const createTeacher = async (req, res) => {
     const {
       name,
       email,
-      password,
       role = 'teacher',
-      institutionUid,
       sendEmail = false,
     } = req.body || {}
 
     const trimmedName = String(name || '').trim()
     const trimmedEmail = String(email || '').trim().toLowerCase()
-    const trimmedPassword = String(password || '').trim()
     const trimmedRole = String(role || 'teacher').trim()
-    const resolvedInstitutionUid = String(institutionUid || '').trim() || process.env.DEFAULT_INSTITUTE_UID || ''
-    const normalizedInstituteUid = normalizeUidBase(resolvedInstitutionUid)
+    const scopedInstitutionUid = getScopedInstitutionUid(req)
+    const normalizedInstituteUid = normalizeUidBase(scopedInstitutionUid)
 
     if (!trimmedName) {
       return res.status(400).json({
@@ -303,13 +305,6 @@ const createTeacher = async (req, res) => {
       })
     }
 
-    if (!trimmedPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password is required.',
-      })
-    }
-
     if (trimmedRole !== 'teacher') {
       return res.status(400).json({
         success: false,
@@ -317,21 +312,22 @@ const createTeacher = async (req, res) => {
       })
     }
 
-    const existingTeacherQuery = {
+    if (!normalizedInstituteUid) {
+      return res.status(403).json({
+        success: false,
+        message: 'Institution scope is required for teacher invites.',
+      })
+    }
+
+    const existingInvite = await InstituteInvite.findOne({
       email: trimmedEmail,
-      role: 'teacher',
-    }
+      institutionUid: normalizedInstituteUid,
+    })
 
-    if (normalizedInstituteUid) {
-      existingTeacherQuery.institutionUid = normalizedInstituteUid
-    }
-
-    const existingTeacher = await User.findOne(existingTeacherQuery)
-
-    if (existingTeacher) {
+    if (existingInvite) {
       return res.status(409).json({
         success: false,
-        message: 'A teacher with this email already exists in the institute.',
+        message: 'A teacher invite with this email already exists in the institute.',
       })
     }
 
@@ -339,43 +335,29 @@ const createTeacher = async (req, res) => {
     const inviteStatus = sendEmail ? 'sent' : 'draft'
     const inviteSentAt = sendEmail ? new Date() : undefined
 
-    const teacher = new User({
+    const inviteRecord = new InstituteInvite({
+      institutionUid: normalizedInstituteUid,
       name: trimmedName,
       email: trimmedEmail,
-      password: trimmedPassword,
-      role: 'teacher',
-      institutionUid: normalizedInstituteUid,
       teacherUid,
-      inviteStatus,
-      inviteSentAt,
+      status: inviteStatus === 'sent' ? 'pending' : 'draft',
+      resendCount: 0,
+      lastSentAt: inviteSentAt,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
 
-    await teacher.save()
+    await inviteRecord.save()
 
     let emailDispatch = null
-    let inviteRecord = null
-
-    if (sendEmail) {
-      inviteRecord = await InstituteInvite.create({
-        institutionUid: normalizedInstituteUid,
-        name: trimmedName,
-        email: trimmedEmail,
-        teacherUid,
-        status: 'pending',
-        resendCount: 0,
-        lastSentAt: new Date(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      })
-    }
 
     if (sendEmail) {
       try {
-      emailDispatch = await sendTeacherInvitationEmail({
-        email: trimmedEmail,
-        name: trimmedName,
-        teacherUid,
-        institutionUid: normalizedInstituteUid,
-      })
+        emailDispatch = await sendTeacherInvitationEmail({
+          email: trimmedEmail,
+          name: trimmedName,
+          teacherUid,
+          institutionUid: normalizedInstituteUid,
+        })
 
         await InstituteActivity.create({
           institutionUid: normalizedInstituteUid,
@@ -384,68 +366,59 @@ const createTeacher = async (req, res) => {
           title: `${trimmedName} was invited`,
           detail: trimmedEmail,
         })
+        inviteRecord.status = 'pending'
+        inviteRecord.lastSentAt = new Date()
+        await inviteRecord.save()
       } catch (emailError) {
         return res.status(502).json({
           success: false,
-          message: 'Teacher record was saved, but the invitation email could not be sent.',
+          message: 'Teacher invite was saved, but the invitation email could not be sent.',
           error: emailError.message || String(emailError),
           data: {
-            id: teacher._id,
-            name: teacher.name,
-            email: teacher.email,
-            role: teacher.role,
-            institutionUid: teacher.institutionUid,
-            teacherUid: teacher.teacherUid,
-            inviteStatus: teacher.inviteStatus,
-            inviteSentAt: teacher.inviteSentAt || null,
-            inviteRecord: inviteRecord
-              ? {
-                  id: inviteRecord._id,
-                  email: inviteRecord.email,
-                  status: inviteRecord.status,
-                  resendCount: inviteRecord.resendCount,
-                  lastSentAt: inviteRecord.lastSentAt,
-                  expiresAt: inviteRecord.expiresAt,
-                }
-              : null,
-            emailDispatch,
-          },
-        })
-      }
-    } else {
-      await InstituteActivity.create({
-        institutionUid: normalizedInstituteUid,
-        teacherName: trimmedName,
-        type: 'teacher_joined',
-        title: `${trimmedName} was added as a teacher`,
-        detail: trimmedEmail,
-      })
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: sendEmail
-        ? 'Teacher created and invitation sent successfully.'
-        : 'Teacher saved successfully.',
-      data: {
-        id: teacher._id,
-        name: teacher.name,
-        email: teacher.email,
-        role: teacher.role,
-        institutionUid: teacher.institutionUid,
-        teacherUid: teacher.teacherUid,
-        inviteStatus: teacher.inviteStatus,
-        inviteSentAt: teacher.inviteSentAt,
-        inviteRecord: inviteRecord
-          ? {
+            id: inviteRecord._id,
+            name: inviteRecord.name,
+            email: inviteRecord.email,
+            role: 'teacher',
+            institutionUid: inviteRecord.institutionUid,
+            teacherUid: inviteRecord.teacherUid,
+            inviteStatus: inviteRecord.status,
+            inviteSentAt: inviteRecord.lastSentAt || null,
+            inviteRecord: {
               id: inviteRecord._id,
               email: inviteRecord.email,
               status: inviteRecord.status,
               resendCount: inviteRecord.resendCount,
               lastSentAt: inviteRecord.lastSentAt,
               expiresAt: inviteRecord.expiresAt,
-            }
-          : null,
+            },
+            emailDispatch,
+          },
+        })
+      }
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: sendEmail
+        ? 'Teacher invite created and sent successfully.'
+        : 'Teacher invite saved successfully.',
+      data: {
+        id: inviteRecord._id,
+        name: inviteRecord.name,
+        email: inviteRecord.email,
+        role: 'teacher',
+        institutionUid: inviteRecord.institutionUid,
+        teacherUid: inviteRecord.teacherUid,
+        inviteStatus: inviteRecord.status,
+        inviteSentAt: inviteRecord.lastSentAt || null,
+        inviteRecord: {
+          id: inviteRecord._id,
+          email: inviteRecord.email,
+          status: inviteRecord.status,
+          resendCount: inviteRecord.resendCount,
+          lastSentAt: inviteRecord.lastSentAt,
+          expiresAt: inviteRecord.expiresAt,
+        },
         emailDispatch,
       },
     })
@@ -460,7 +433,8 @@ const createTeacher = async (req, res) => {
 
 const getInvites = async (req, res) => {
   try {
-    const data = await loadInstituteData(req.query.institutionId || req.query.institutionUid || '')
+    const institutionUid = getScopedInstitutionUid(req)
+    const data = await loadInstituteData(institutionUid)
 
     return res.status(200).json({
       success: true,
@@ -478,7 +452,8 @@ const getInvites = async (req, res) => {
 const resendInvite = async (req, res) => {
   try {
     const { id } = req.params
-    const invite = await InstituteInvite.findById(id)
+    const institutionUid = getScopedInstitutionUid(req)
+    const invite = await InstituteInvite.findOne({ _id: id, institutionUid })
 
     if (!invite) {
       return res.status(404).json({
@@ -497,6 +472,7 @@ const resendInvite = async (req, res) => {
         institutionUid: invite.institutionUid,
       })
 
+      invite.status = 'pending'
       invite.resendCount = (invite.resendCount || 0) + 1
       invite.lastSentAt = new Date()
       await invite.save()

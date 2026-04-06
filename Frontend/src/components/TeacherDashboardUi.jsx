@@ -84,15 +84,32 @@ export function TeacherSidebar({ navItems, activeKey }) {
       <nav className="flex-1 space-y-1.5 px-4 pt-4">
         {navItems.filter(item => !item.adminOnly).map((item) => {
           const active = item.key === activeKey
+          const sharedClassName = `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+            active
+              ? 'bg-blue-50 text-blue-600'
+              : 'text-slate-600 hover:bg-slate-50'
+          } ${item.disabled ? 'cursor-not-allowed opacity-50' : ''}`
+
+          if (item.disabled) {
+            return (
+              <button
+                key={item.key}
+                type="button"
+                disabled
+                title="Coming soon"
+                className={sharedClassName}
+              >
+                <SidebarIcon type={item.icon} active={active} />
+                {item.label}
+              </button>
+            )
+          }
+
           return (
             <a
               key={item.key}
-              href={item.disabled ? '#' : item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
-                active 
-                  ? 'bg-blue-50 text-blue-600' 
-                  : 'text-slate-600 hover:bg-slate-50'
-              } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              href={item.href}
+              className={sharedClassName}
             >
               <SidebarIcon type={item.icon} active={active} />
               {item.label}
@@ -162,12 +179,23 @@ export function TeacherTopbar() {
           </svg>
           <span className="absolute right-2.5 top-2.5 flex h-2.5 w-2.5 rounded-full border-2 border-white bg-blue-600"></span>
         </button>
-        <button className="flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700">
+        <button
+          className="flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+          disabled
+          title="Quick generate is coming soon"
+          type="button"
+        >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           Quick Generate
         </button>
+        <a
+          href="/logout"
+          className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          Logout
+        </a>
       </div>
     </header>
   )
@@ -237,21 +265,45 @@ export function RecentPaperRow({ name, timestamp, subject, status }) {
   )
 }
 
-export function ActionCard({ icon, label, href, iconBg }) {
-  return (
-    <a 
-      href={href}
-      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50/50 group"
-    >
+export function ActionCard({ icon, label, href, iconBg, disabled = false }) {
+  const content = (
+    <>
       <div className="flex items-center gap-4">
         <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${iconBg}`}>
           {icon}
         </div>
         <span className="text-[15px] font-bold text-slate-800">{label}</span>
       </div>
-      <svg className="h-5 w-5 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-      </svg>
+      {disabled ? (
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">
+          Coming soon
+        </span>
+      ) : (
+        <svg className="h-5 w-5 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      )}
+    </>
+  )
+
+  if (disabled) {
+    return (
+      <div
+        aria-disabled="true"
+        title="Coming soon"
+        className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 opacity-75 shadow-sm transition-all"
+      >
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <a 
+      href={href}
+      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50/50 group"
+    >
+      {content}
     </a>
   )
 }

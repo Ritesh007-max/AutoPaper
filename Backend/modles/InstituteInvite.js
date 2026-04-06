@@ -8,7 +8,7 @@ const instituteInviteSchema = new mongoose.Schema({
   teacherUid: { type: String, trim: true },
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'expired'],
+    enum: ['draft', 'pending', 'accepted', 'expired'],
     default: 'pending',
   },
   resendCount: { type: Number, default: 0 },

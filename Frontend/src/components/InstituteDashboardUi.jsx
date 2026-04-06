@@ -89,6 +89,7 @@ export function SectionHeader({ eyebrow, title, description, action }) {
 export function StatusBadge({ status }) {
   const normalized = String(status || '').toLowerCase()
   const styles = {
+    draft: 'bg-amber-50 text-amber-700 ring-amber-100',
     pending: 'bg-amber-50 text-amber-700 ring-amber-100',
     accepted: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
     expired: 'bg-slate-100 text-slate-600 ring-slate-200',
@@ -299,10 +300,10 @@ export function InviteTable({ invites, loading = false, error = '', onResend, re
               <button
                 type="button"
                 onClick={() => onResend?.(invite)}
-                disabled={invite.status !== 'pending' || resendingId === invite.id}
+                disabled={invite.status === 'accepted' || resendingId === invite.id}
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {resendingId === invite.id ? 'Sending...' : 'Resend'}
+                {resendingId === invite.id ? 'Sending...' : invite.status === 'draft' ? 'Send' : 'Resend'}
               </button>
             </div>
           </div>
