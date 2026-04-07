@@ -485,18 +485,10 @@ const requestPasswordReset = async (req, res) => {
         resetToken: token,
       })
     } catch (error) {
-      if (!String(error.message || '').includes('SMTP is not configured')) {
-        throw error
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: 'Password reset link generated. SMTP is not configured, so the reset URL is returned for testing.',
-        resetUrl: buildFrontendUrl('/reset-password', {
-          token,
-          role: user.role,
-          email: user.email,
-        }),
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send password reset email.',
+        error: error.message,
       })
     }
 
