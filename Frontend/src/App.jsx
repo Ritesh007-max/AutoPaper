@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 
 import LandingPage from './pages/PublicPages/LandingPage'
 import AuthPage from './pages/PublicPages/AuthPage'
+import ForgotPasswordPage from './pages/PublicPages/ForgotPasswordPage'
+import GoogleAuthCallbackPage from './pages/PublicPages/GoogleAuthCallbackPage'
 import LogoutPage from './pages/PublicPages/LogoutPage'
+import ResetPasswordPage from './pages/PublicPages/ResetPasswordPage'
 import TeacherSectionPage from './pages/TeacherPages/TeacherSectionPage'
 import InstituteSectionPage from './pages/InstitutePages/InstituteSectionPage'
 import AdminInstitutesPage from './pages/AdminPages/AdminInstitutesPage'
@@ -58,6 +61,18 @@ function App() {
 
   if (pathname === '/logout') {
     return <LogoutPage />
+  }
+
+  if (pathname === '/forgot-password') {
+    return <ForgotPasswordPage />
+  }
+
+  if (pathname === '/reset-password') {
+    return <ResetPasswordPage />
+  }
+
+  if (pathname === '/auth/google/callback') {
+    return <GoogleAuthCallbackPage />
   }
 
   if (pathname === '/') {

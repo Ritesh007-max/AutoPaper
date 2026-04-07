@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { loginUser, registerUser } from '../../api/auth'
+import { buildGoogleAuthUrl, loginUser, registerUser } from '../../api/auth'
 import SectionCard from '../../components/SectionCard'
 import {
   getDashboardPathForRole,
@@ -14,20 +14,22 @@ import {
 
 const getInitialParams = (mode) => {
   if (typeof window === 'undefined') {
-    return { role: 'teacher', code: '' }
+    return { role: 'teacher', code: '', authError: '' }
   }
 
   const params = new URLSearchParams(window.location.search)
   const requestedRole = normalizeRole(params.get('role'))
   const code = String(params.get('code') || params.get('uid') || '').trim()
+  const authError = String(params.get('authError') || '').trim()
 
   if (mode === 'register' && requestedRole === 'Admin') {
-    return { role: 'teacher', code: '' }
+    return { role: 'teacher', code: '', authError }
   }
 
   return {
     role: requestedRole || 'teacher',
     code,
+    authError,
   }
 }
 
@@ -51,7 +53,11 @@ function AuthPage({ mode }) {
   const initialParams = getInitialParams(mode)
   const [role, setRole] = useState(initialParams.role)
   const [form, setForm] = useState(getInitialForm(mode, initialParams.code))
-  const [status, setStatus] = useState({ type: '', message: '' })
+  const [status, setStatus] = useState(
+    initialParams.authError
+      ? { type: 'error', message: initialParams.authError }
+      : { type: '', message: '' },
+  )
   const [loading, setLoading] = useState(false)
   const storedAuth = getStoredAuth()
 
@@ -64,23 +70,30 @@ function AuthPage({ mode }) {
   useEffect(() => {
     if (mode === 'login') {
       setForm(getInitialForm('login'))
-      setStatus({ type: '', message: '' })
+      setStatus(
+        initialParams.authError
+          ? { type: 'error', message: initialParams.authError }
+          : { type: '', message: '' },
+      )
       return
     }
 
     setForm(getInitialForm('register', initialParams.code))
-    setStatus({ type: '', message: '' })
-  }, [mode, role, initialParams.code])
+    setStatus(
+      initialParams.authError
+        ? { type: 'error', message: initialParams.authError }
+        : { type: '', message: '' },
+    )
+  }, [mode, role, initialParams.code, initialParams.authError])
 
-  const roleOptions = mode === 'login'
-    ? ['teacher', 'instituteAdmin', 'Admin']
-    : ['teacher', 'instituteAdmin']
+  const roleOptions = mode === 'login' ? ['teacher', 'instituteAdmin', 'Admin'] : ['teacher', 'instituteAdmin']
+  const googleAuthEnabled = role !== 'Admin'
 
   const authTitle = mode === 'login' ? 'Welcome back' : 'Join your workspace'
   const authSubtitle =
     mode === 'login'
-      ? 'Log in with the role that matches your dashboard.'
-      : 'Use the registration code from your invitation email, then set your own password.'
+      ? 'Log in with email and password, or use Google for supported roles.'
+      : 'Use the registration code from your invitation email, then create your own password or finish with Google.'
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -185,6 +198,32 @@ function AuthPage({ mode }) {
     }
   }
 
+  const continueWithGoogle = () => {
+    if (!googleAuthEnabled) {
+      setStatus({
+        type: 'error',
+        message: 'Google sign-in is not available for system admins.',
+      })
+      return
+    }
+
+    if (mode === 'register' && !form.code.trim()) {
+      setStatus({
+        type: 'error',
+        message: 'Please enter your registration code before continuing with Google.',
+      })
+      return
+    }
+
+    window.location.assign(
+      buildGoogleAuthUrl({
+        mode,
+        role,
+        code: mode === 'register' ? form.code.trim() : '',
+      }),
+    )
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 lg:grid-cols-[1fr,0.95fr]">
@@ -195,22 +234,21 @@ function AuthPage({ mode }) {
           <a href="/" className="text-xs font-black uppercase tracking-[0.3em] text-sky-200">
             AutoPaper
           </a>
-          <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-white sm:text-5xl">
-            {authTitle}
-          </h1>
+          <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-white sm:text-5xl">{authTitle}</h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">{authSubtitle}</p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-200">Invite first</p>
               <p className="mt-3 text-sm leading-6 text-slate-300">
-                System admins invite institutes, and institutes invite teachers. Registration happens with the code they receive.
+                System admins invite institutes, and institutes invite teachers. Registration happens with the code
+                they receive.
               </p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-200">Own password</p>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-200">Password help</p>
               <p className="mt-3 text-sm leading-6 text-slate-300">
-                The invited user creates their own password during registration, then uses email + password to log in later.
+                If you forget your password, we can send a reset link to your email and get you back in quickly.
               </p>
             </div>
           </div>
@@ -240,13 +278,11 @@ function AuthPage({ mode }) {
                     <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-500">
                       {mode === 'login' ? 'Login' : 'Register'}
                     </p>
-                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-                      {getRoleLabel(role)} access
-                    </h2>
+                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{getRoleLabel(role)} access</h2>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       {mode === 'login'
-                        ? 'Authenticate with your email and password.'
-                        : 'Enter the registration code from your invite, then create your own password.'}
+                        ? 'Authenticate with your email and password, or continue with Google.'
+                        : 'Enter the registration code from your invite, then create your own password or finish with Google.'}
                     </p>
                   </div>
 
@@ -321,9 +357,17 @@ function AuthPage({ mode }) {
                       </label>
 
                       <label className="block">
-                        <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                          Password
-                        </span>
+                        <div className="mb-1.5 flex items-center justify-between gap-3">
+                          <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                            Password
+                          </span>
+                          <a
+                            href={`/forgot-password?role=${encodeURIComponent(role)}`}
+                            className="text-xs font-semibold text-sky-600 transition hover:text-sky-700"
+                          >
+                            Forgot password?
+                          </a>
+                        </div>
                         <input
                           name="password"
                           type="password"
@@ -413,12 +457,37 @@ function AuthPage({ mode }) {
                       {loading ? 'Working...' : mode === 'login' ? 'Login' : 'Create Account'}
                     </button>
 
+                    <button
+                      type="button"
+                      onClick={continueWithGoogle}
+                      disabled={loading || !googleAuthEnabled}
+                      className="rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {mode === 'login' ? 'Continue with Google' : 'Continue with Google'}
+                    </button>
+                  </div>
+
+                  <p className="text-xs leading-6 text-slate-500">
+                    {mode === 'register'
+                      ? 'Google sign-up uses your Google profile and the invitation code entered above.'
+                      : 'Google sign-in works for accounts that were created or linked with Google on this workspace.'}
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                     <a
                       href={mode === 'login' ? getRegisterPathForRole(role) : getLoginPathForRole(role)}
                       className="rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                     >
                       {mode === 'login' ? 'Need to register?' : 'Already registered?'}
                     </a>
+                    {mode === 'login' ? (
+                      <a
+                        href={`/forgot-password?role=${encodeURIComponent(role)}`}
+                        className="text-sm font-semibold text-sky-600 transition hover:text-sky-700"
+                      >
+                        Forgot password?
+                      </a>
+                    ) : null}
                   </div>
                 </form>
               </div>

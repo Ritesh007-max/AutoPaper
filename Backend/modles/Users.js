@@ -6,12 +6,16 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, trim: true, lowercase: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['teacher', 'instituteAdmin', 'Admin', 'Student'], required: true },
+  authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+  googleId: { type: String, unique: true, sparse: true },
   institutionName: { type: String },
   institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
   institutionUid: { type: String },
   teacherUid: { type: String, unique: true, sparse: true },
   inviteStatus: { type: String, enum: ['draft', 'sent'], default: 'draft' },
   inviteSentAt: { type: Date },
+  passwordResetTokenHash: { type: String, sparse: true },
+  passwordResetTokenExpiresAt: { type: Date },
 }, {
   timestamps: true,
 })
