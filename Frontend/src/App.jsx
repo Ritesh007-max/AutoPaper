@@ -27,7 +27,8 @@ const getExpectedRoleForPath = (pathname) => {
     pathname === '/teachers' ||
     pathname === '/teachers/invite' ||
     pathname === '/activity' ||
-    pathname === '/invites'
+    pathname === '/invites' ||
+    pathname === '/notifications'
   ) {
     return 'instituteAdmin'
   }

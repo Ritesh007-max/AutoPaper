@@ -1,3 +1,12 @@
+import { useEffect, useRef, useState } from 'react'
+
+import {
+  getTeacherNotifications,
+  markAllTeacherNotificationsRead,
+  markTeacherNotificationRead,
+} from '../api/teacher'
+import { formatRelativeTime } from '../utils/instituteFormatters'
+
 function SidebarIcon({ type, active = false }) {
   const iconClassName = active ? 'text-blue-600' : 'text-slate-400'
 
@@ -63,6 +72,15 @@ function SidebarIcon({ type, active = false }) {
 
   return icons[type] || null
 }
+
+const normalizeTeacherNotification = (notification = {}) => ({
+  id: notification.id || notification._id || crypto.randomUUID(),
+  title: notification.title || 'Notification',
+  message: notification.message || '',
+  status: notification.status || 'unread',
+  createdAt: notification.sentAt || notification.createdAt || null,
+  createdAtLabel: formatRelativeTime(notification.sentAt || notification.createdAt),
+})
 
 export function TeacherSidebar({ navItems, activeKey }) {
   return (
@@ -157,6 +175,128 @@ export function TeacherSidebar({ navItems, activeKey }) {
 }
 
 export function TeacherTopbar() {
+  const [notificationsState, setNotificationsState] = useState({
+    loading: true,
+    error: '',
+    data: [],
+    unreadCount: 0,
+  })
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  const fetchNotifications = async ({ quiet = false } = {}) => {
+    if (!quiet) {
+      setNotificationsState((current) => ({
+        ...current,
+        loading: true,
+        error: '',
+      }))
+    }
+
+    try {
+      const response = await getTeacherNotifications({ limit: 8 })
+      const payload = response.data?.data || {}
+      const items = Array.isArray(payload.items) ? payload.items.map(normalizeTeacherNotification) : []
+
+      setNotificationsState({
+        loading: false,
+        error: '',
+        data: items,
+        unreadCount: Number(payload.unreadCount) || 0,
+      })
+    } catch (error) {
+      setNotificationsState({
+        loading: false,
+        error: error.response?.data?.message || error.message || 'Failed to load notifications.',
+        data: [],
+        unreadCount: 0,
+      })
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+
+    const loadNotifications = async () => {
+      if (!active) {
+        return
+      }
+
+      await fetchNotifications()
+    }
+
+    loadNotifications()
+
+    const intervalId = window.setInterval(() => {
+      if (active) {
+        void fetchNotifications({ quiet: true })
+      }
+    }, 60000)
+
+    const handleDocumentClick = (event) => {
+      if (!menuRef.current) {
+        return
+      }
+
+      if (!menuRef.current.contains(event.target)) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleDocumentClick)
+
+    return () => {
+      active = false
+      window.clearInterval(intervalId)
+      document.removeEventListener('mousedown', handleDocumentClick)
+    }
+  }, [])
+
+  const handleToggleMenu = () => {
+    setMenuOpen((currentOpen) => {
+      const nextOpen = !currentOpen
+
+      if (nextOpen && notificationsState.loading === false) {
+        void fetchNotifications({ quiet: true })
+      }
+
+      return nextOpen
+    })
+  }
+
+  const handleMarkRead = async (notification) => {
+    if (!notification?.id || notification.status === 'read') {
+      return
+    }
+
+    try {
+      await markTeacherNotificationRead(notification.id)
+      await fetchNotifications({ quiet: true })
+    } catch (error) {
+      setNotificationsState((current) => ({
+        ...current,
+        error: error.response?.data?.message || error.message || 'Failed to update notification.',
+      }))
+    }
+  }
+
+  const handleMarkAllRead = async () => {
+    if (!notificationsState.unreadCount) {
+      setMenuOpen(false)
+      return
+    }
+
+    try {
+      await markAllTeacherNotificationsRead()
+      await fetchNotifications({ quiet: true })
+    } catch (error) {
+      setNotificationsState((current) => ({
+        ...current,
+        error: error.response?.data?.message || error.message || 'Failed to update notifications.',
+      }))
+    }
+  }
+
   return (
     <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-slate-100 bg-white/80 px-8 backdrop-blur-md">
       <div className="relative w-full max-w-[500px]">
@@ -173,12 +313,106 @@ export function TeacherTopbar() {
       </div>
 
       <div className="flex items-center gap-5">
-        <button className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-50">
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span className="absolute right-2.5 top-2.5 flex h-2.5 w-2.5 rounded-full border-2 border-white bg-blue-600"></span>
-        </button>
+        <div className="relative" ref={menuRef}>
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            aria-expanded={menuOpen}
+            aria-label="Teacher notifications"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-50"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            {notificationsState.unreadCount > 0 ? (
+              <span className="absolute -right-0.5 -top-0.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-black text-white">
+                {notificationsState.unreadCount > 9 ? '9+' : notificationsState.unreadCount}
+              </span>
+            ) : null}
+          </button>
+
+          {menuOpen ? (
+            <div className="absolute right-0 top-12 w-[370px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_30px_60px_rgba(15,23,42,0.18)]">
+              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Notifications</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">
+                    {notificationsState.unreadCount} unread
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleMarkAllRead}
+                  className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+                >
+                  Mark all read
+                </button>
+              </div>
+
+              <div className="max-h-[420px] overflow-y-auto">
+                {notificationsState.loading ? (
+                  <div className="space-y-3 p-4">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                        <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+                        <div className="mt-2 h-3 w-full animate-pulse rounded bg-slate-100" />
+                        <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-slate-100" />
+                      </div>
+                    ))}
+                  </div>
+                ) : notificationsState.error ? (
+                  <div className="p-4">
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                      {notificationsState.error}
+                    </div>
+                  </div>
+                ) : notificationsState.data.length ? (
+                  <div className="divide-y divide-slate-100">
+                    {notificationsState.data.map((notification) => {
+                      const isUnread = notification.status !== 'read'
+
+                      return (
+                        <button
+                          key={notification.id}
+                          type="button"
+                          onClick={() => void handleMarkRead(notification)}
+                          className={`block w-full px-4 py-4 text-left transition hover:bg-slate-50 ${
+                            isUnread ? 'bg-sky-50/40' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span
+                              className={`mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full ${
+                                isUnread ? 'bg-sky-500' : 'bg-slate-300'
+                              }`}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-sm font-bold text-slate-900">{notification.title}</p>
+                                <span className="whitespace-nowrap text-[11px] font-semibold text-slate-400">
+                                  {notification.createdAtLabel}
+                                </span>
+                              </div>
+                              {notification.message ? (
+                                <p className="mt-1 text-sm leading-6 text-slate-600">{notification.message}</p>
+                              ) : null}
+                            </div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="px-4 py-10 text-center">
+                    <p className="text-sm font-bold text-slate-900">No notifications yet</p>
+                    <p className="mt-2 text-sm text-slate-500">New notifications from your institute will appear here.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
         <button
           className="flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
           disabled

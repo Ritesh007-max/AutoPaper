@@ -3,6 +3,7 @@ const navItems = [
   { key: 'teachers', href: '/teachers', label: 'Teachers' },
   { key: 'activity', href: '/activity', label: 'Activity' },
   { key: 'invites', href: '/teachers/invite', label: 'Invite Teachers' },
+  { key: 'notifications', href: '/notifications', label: 'Notifications' },
 ]
 
 function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, description, actions, children }) {

@@ -13,3 +13,7 @@ export const getInstituteInvites = (params) => api.get('/invites', { params })
 export const resendInstituteInvite = (inviteId) => api.post(`/invites/${inviteId}/resend`)
 
 export const createInstituteTeacher = (payload) => api.post('/teachers', payload)
+
+export const getInstituteNotifications = (params) => api.get('/notifications', { params })
+
+export const createInstituteNotification = (payload) => api.post('/notifications', payload)
