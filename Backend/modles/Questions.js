@@ -5,7 +5,7 @@ const questionSchema = new mongoose.Schema({
   questionType: { type: String, enum: ['MCQ','obj', 'gr','1m', '2m', '3m','5m'], required: true },
   options: [String],          // only filled for MCQ
   subject: { type: String, required: true },
-  chapter: { type: String },
+  chapter: { type: Number, required: true },
   grade: { type: Number, required: true },
   difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
   marks: { type: Number, required: true },
@@ -18,7 +18,7 @@ const questionSchema = new mongoose.Schema({
   timestamps: true,
 })
 
-module.exports = mongoose.model('Question', questionSchema, 'question');
+module.exports = mongoose.model('Question', questionSchema, 'questions');
 
 
 

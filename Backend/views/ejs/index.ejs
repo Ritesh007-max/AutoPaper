@@ -18,6 +18,7 @@
 
 <%let i = 0%>
 <%for(let q of question){%>
+
     <%if(typeof q === 'string'){i=0%>
     <h5><%= q %></h5>
     <%}else{%>
@@ -36,6 +37,7 @@
                 <%i=i+1;%>
             <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3><br>
             <%}%>
+            
 <%}}}%>
 
 </body>
