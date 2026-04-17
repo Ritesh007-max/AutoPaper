@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const ejs= require("ejs");
 const path = require("path");
 const ejsMate = require("ejs-mate");
-const cookieParser = require('cookie-parser');
 
 const generateqp = require("./functions/generatepaper.js");
 const home = require("./routes/home.js");
@@ -18,7 +17,6 @@ app.set("views",path.join(__dirname,'./views/ejs'))
 app.use(express.static(path.join(__dirname,'./public')));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser());
 
 main().then(()=>{
     console.log("connected")

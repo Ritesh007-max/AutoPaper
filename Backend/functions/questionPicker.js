@@ -1,21 +1,24 @@
-let quota = [5,6,6,7,5,7,6,6,7,5];
+const Question = require('../modles/questions');
 
-function pickQuestions(sourceArray, count, qp ,name) {
-    
+async function pickQuestions(type, count, qp ,name, limit) {
+    let sourceArray = await Question.find({ questionType: type});
     let n =0;
-    let limit = quota;
 
     while(n < count ){
         let l = sourceArray.length;
         let j = Math.floor(Math.random() * l);
+        let qs = sourceArray[j];
 
-        if(sourceArray[j].marks <= limit[sourceArray[j].chapter - 1]){
-            qp.push(sourceArray[j]);
+        let k =sourceArray[j].marks
+        let lim = limit[sourceArray[j].chapter-1];
+        if(k <= lim){
+            qp.push(qs);
             sourceArray.splice(j, 1);
             n+=1;
-            limit[sourceArray[j].chapter - 1] -= sourceArray[j].marks;
+            limit[qs.chapter-1] -= qs.marks;
         }
-    }qp.push(name);
-}
+    }
+    qp.push(name);
 
+}
 module.exports= pickQuestions;
