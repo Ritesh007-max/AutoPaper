@@ -1,4 +1,4 @@
-import { createApiClient } from './client'
+import { createApiClient, getApiBaseUrl } from './client'
 
 const api = createApiClient('/api/auth')
 
@@ -13,7 +13,7 @@ export const requestPasswordReset = (payload) => api.post('/forgot-password', pa
 export const resetPassword = (payload) => api.post('/reset-password', payload)
 
 export const buildGoogleAuthUrl = ({ mode, role, code }) => {
-  const url = new URL('/api/auth/google/start', window.location.origin)
+  const url = new URL('/api/auth/google/start', `${getApiBaseUrl()}/`)
   url.searchParams.set('mode', mode)
   url.searchParams.set('role', role)
 

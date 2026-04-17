@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --tp-primary: #3B82F6;
-  --tp-primary-strong: #2563EB;
-  --tp-primary-soft: #EFF6FF;
-  --tp-secondary: #F8FAFC;
-  --tp-text: #1F2937;
-  --tp-text-muted: #6B7280;
-  --tp-border: #E2E8F0;
-  --tp-surface: #F8FAFC;
-  --tp-card: #FFFFFF;
+  --tp-primary: #4f46e5;
+  --tp-primary-strong: #4338ca;
+  --tp-primary-soft: #eef2ff;
+  --tp-secondary: #f9fafb;
+  --tp-text: #111827;
+  --tp-text-muted: #6b7280;
+  --tp-border: #e5e7eb;
+  --tp-surface: #f9fafb;
+  --tp-card: #ffffff;
 }
 
 html,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { buildGoogleAuthUrl, loginUser, registerUser } from '../../api/auth'
 import SectionCard from '../../components/SectionCard'
+import { baseInputClassName } from '../../components/formStyles'
 import {
   getDashboardPathForRole,
   getLoginPathForRole,
@@ -225,60 +226,77 @@ function AuthPage({ mode }) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 lg:grid-cols-[1fr,0.95fr]">
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.28),_transparent_28%),linear-gradient(180deg,_rgba(15,23,42,0.95),_rgba(2,6,23,0.98))] p-8 shadow-2xl shadow-slate-950/50 lg:p-12">
-          <div className="absolute left-8 top-8 h-24 w-24 rounded-full bg-sky-500/15 blur-2xl" />
-          <div className="absolute right-4 top-24 h-32 w-32 rounded-full bg-emerald-500/15 blur-3xl" />
-
-          <a href="/" className="text-xs font-black uppercase tracking-[0.3em] text-sky-200">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+          <a href="/" className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600">
             AutoPaper
           </a>
-          <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-white sm:text-5xl">{authTitle}</h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">{authSubtitle}</p>
+          <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+            {authTitle}
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">{authSubtitle}</p>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-200">Invite first</p>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-600">Invite first</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 System admins invite institutes, and institutes invite teachers. Registration happens with the code
                 they receive.
               </p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-200">Password help</p>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-600">Password help</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 If you forget your password, we can send a reset link to your email and get you back in quickly.
               </p>
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <a
               href={mode === 'login' ? getRegisterPathForRole(role) : getLoginPathForRole(role)}
-              className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+              className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
             >
               {mode === 'login' ? 'Need an account?' : 'Already have an account?'}
             </a>
             <a
               href={getLoginPathForRole('Admin')}
-              className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+              className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700"
             >
               System Admin Login
             </a>
           </div>
+
+          <div className="mt-10 grid gap-3">
+            {[
+              { label: 'Dashboard-style UI', detail: 'Same surfaces, spacing, and typography as the logged-in app.' },
+              { label: 'Role aware routing', detail: 'Teachers, institute admins, and admins all get the right entry point.' },
+              { label: 'Simple recovery', detail: 'Forgot-password and reset flows follow the same clean theme.' },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-indigo-600" />
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{item.label}</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">{item.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
-        <section className="flex items-center">
-          <div className="w-full">
+        <section className="flex items-center justify-center">
+          <div className="w-full max-w-2xl">
             <SectionCard>
-              <div className="rounded-[1.5rem] bg-white p-6 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+              <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 text-slate-900">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-500">
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-600">
                       {mode === 'login' ? 'Login' : 'Register'}
                     </p>
-                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{getRoleLabel(role)} access</h2>
+                    <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
+                      {getRoleLabel(role)} access
+                    </h2>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       {mode === 'login'
                         ? 'Authenticate with your email and password, or continue with Google.'
@@ -295,7 +313,7 @@ function AuthPage({ mode }) {
                         }
                       }}
                       className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                        mode === 'login' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                        mode === 'login' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Login
@@ -308,7 +326,7 @@ function AuthPage({ mode }) {
                         }
                       }}
                       className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                        mode === 'register' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                        mode === 'register' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Register
@@ -325,7 +343,7 @@ function AuthPage({ mode }) {
                       name="role"
                       value={role}
                       onChange={handleRoleChange}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                      className={baseInputClassName}
                     >
                       {roleOptions.map((option) => (
                         <option key={option} value={option}>
@@ -351,7 +369,7 @@ function AuthPage({ mode }) {
                           type="email"
                           value={form.email}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder="name@example.com"
                         />
                       </label>
@@ -363,7 +381,7 @@ function AuthPage({ mode }) {
                           </span>
                           <a
                             href={`/forgot-password?role=${encodeURIComponent(role)}`}
-                            className="text-xs font-semibold text-sky-600 transition hover:text-sky-700"
+                            className="text-xs font-semibold text-indigo-600 transition hover:text-indigo-700"
                           >
                             Forgot password?
                           </a>
@@ -373,7 +391,7 @@ function AuthPage({ mode }) {
                           type="password"
                           value={form.password}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder="Your password"
                         />
                       </label>
@@ -388,7 +406,7 @@ function AuthPage({ mode }) {
                           name="name"
                           value={form.name}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder={role === 'instituteAdmin' ? 'Principal / coordinator' : 'Teacher name'}
                         />
                       </label>
@@ -402,7 +420,7 @@ function AuthPage({ mode }) {
                           type="email"
                           value={form.email}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder="name@example.com"
                         />
                       </label>
@@ -416,7 +434,7 @@ function AuthPage({ mode }) {
                           type="password"
                           value={form.password}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder="Create your password"
                         />
                       </label>
@@ -429,7 +447,7 @@ function AuthPage({ mode }) {
                           name="code"
                           value={form.code}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                          className={baseInputClassName}
                           placeholder={role === 'teacher' ? 'Teacher code from email' : 'Institute UID from email'}
                         />
                       </label>
@@ -452,7 +470,7 @@ function AuthPage({ mode }) {
                     <button
                       type="submit"
                       disabled={loading || (mode === 'register' && role === 'Admin')}
-                      className="rounded-full bg-sky-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-full bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {loading ? 'Working...' : mode === 'login' ? 'Login' : 'Create Account'}
                     </button>
@@ -461,9 +479,9 @@ function AuthPage({ mode }) {
                       type="button"
                       onClick={continueWithGoogle}
                       disabled={loading || !googleAuthEnabled}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {mode === 'login' ? 'Continue with Google' : 'Continue with Google'}
+                      Continue with Google
                     </button>
                   </div>
 
@@ -476,14 +494,14 @@ function AuthPage({ mode }) {
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                     <a
                       href={mode === 'login' ? getRegisterPathForRole(role) : getLoginPathForRole(role)}
-                      className="rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                      className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
                     >
                       {mode === 'login' ? 'Need to register?' : 'Already registered?'}
                     </a>
                     {mode === 'login' ? (
                       <a
                         href={`/forgot-password?role=${encodeURIComponent(role)}`}
-                        className="text-sm font-semibold text-sky-600 transition hover:text-sky-700"
+                        className="text-sm font-semibold text-indigo-600 transition hover:text-indigo-700"
                       >
                         Forgot password?
                       </a>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { requestPasswordReset } from '../../api/auth'
 import SectionCard from '../../components/SectionCard'
+import { baseInputClassName } from '../../components/formStyles'
 import {
   getDashboardPathForRole,
   getLoginPathForRole,
@@ -69,21 +70,21 @@ function ForgotPasswordPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-5xl items-center">
         <SectionCard>
-          <div className="rounded-[1.5rem] bg-white p-6 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 text-slate-900">
             <div className="max-w-2xl">
-              <a href="/login" className="text-xs font-black uppercase tracking-[0.3em] text-sky-500">
+              <a href="/login" className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600">
                 AutoPaper
               </a>
               <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">Reset your password</h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Enter the email tied to your account and we’ll send a password reset link.
+                Enter the email tied to your account and we&apos;ll send a password reset link.
               </p>
             </div>
 
-            <form className="mt-8 space-y-4 max-w-xl" onSubmit={handleSubmit}>
+            <form className="mt-8 max-w-xl space-y-4" onSubmit={handleSubmit}>
               <label className="block">
                 <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                   Role
@@ -91,7 +92,7 @@ function ForgotPasswordPage() {
                 <select
                   value={role}
                   onChange={(event) => setRole(normalizeRole(event.target.value) || 'teacher')}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                  className={baseInputClassName}
                 >
                   <option value="teacher">Teacher</option>
                   <option value="instituteAdmin">Institute Admin</option>
@@ -107,7 +108,7 @@ function ForgotPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-50"
+                  className={baseInputClassName}
                   placeholder="name@example.com"
                 />
               </label>
@@ -125,9 +126,9 @@ function ForgotPasswordPage() {
               ) : null}
 
               {resetUrl ? (
-                <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
                   <p className="font-semibold">Development reset link</p>
-                  <a href={resetUrl} className="mt-2 block break-all font-medium text-sky-700 underline">
+                  <a href={resetUrl} className="mt-2 block break-all font-medium text-indigo-700 underline">
                     {resetUrl}
                   </a>
                 </div>
@@ -137,13 +138,13 @@ function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-full bg-sky-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? 'Sending...' : 'Send reset link'}
                 </button>
                 <a
                   href={getLoginPathForRole(role)}
-                  className="rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                  className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
                 >
                   Back to login
                 </a>

@@ -366,7 +366,7 @@ const loginUser = async (req, res) => {
     const role = normalizeRole(req.body?.role)
     const email = normalizeEmail(req.body?.email)
     const password = String(req.body?.password || '').trim()
-
+    console.log(role, email, password)
     if (!role) {
       return res.status(400).json({
         success: false,

@@ -7,7 +7,22 @@ const instituteRoutes = require('./routes/institute')
 const adminRoutes = require('./routes/admin')
 
 const app = express()
-app.use(cors())
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}))
+
+app.options('/*path', cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}))
+
+// app.use(cors());
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)

@@ -1,8 +1,12 @@
 const fs = require('fs')
 const path = require('path')
+const express = require('express')
 
 const app = require('./app')
 const connectDB = require('./Config/db')
+
+const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist')
+const frontendIndexPath = path.join(frontendDistPath, 'index.html')
 
 const loadEnvFile = () => {
   const envPath = path.join(__dirname, '.env')
@@ -39,6 +43,18 @@ const startServer = async () => {
   try {
     loadEnvFile()
     await connectDB()
+
+    if (fs.existsSync(frontendIndexPath)) {
+      app.use(express.static(frontendDistPath))
+
+      app.get(/^(?!\/api\/).*/, (req, res, next) => {
+        if (req.method !== 'GET') {
+          return next()
+        }
+
+        return res.sendFile(frontendIndexPath)
+      })
+    }
 
     const port = process.env.PORT || 3000
 
