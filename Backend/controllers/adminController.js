@@ -1,7 +1,9 @@
 const InstituteAdminInvite = require('../modles/InstituteAdminInvite')
+const User = require('../modles/Users')
 const {
   generateInstitutionUid,
 } = require('../utils/institutionUid')
+const { removeInstituteData } = require('../utils/dataRemoval')
 const {
   sendInstituteInvitationEmail,
 } = require('../utils/instituteInvitationMailer')
@@ -40,7 +42,7 @@ const getErrorMessage = (error) => {
 const getInstituteInvites = async (req, res) => {
   try {
     const limit = parseLimit(req.query.limit, 10)
-    const institutes = await InstituteAdminInvite.find({})
+    const institutes = await InstituteAdminInvite.find({ archivedAt: null })
       .sort({ createdAt: -1 })
       .limit(limit)
       .select('adminName adminEmail institutionName institutionUid inviteStatus inviteSentAt resendCount createdAt')
@@ -256,8 +258,65 @@ const resendInstituteInvite = async (req, res) => {
   }
 }
 
+const removeInstitute = async (req, res) => {
+  try {
+    const { id } = req.params
+    const institute = await InstituteAdminInvite.findOne({ _id: id, archivedAt: null })
+
+    if (!institute) {
+      return res.status(404).json({
+        success: false,
+        message: 'Institute not found.',
+      })
+    }
+
+    const institutionUid = String(institute.institutionUid || '').trim()
+
+    if (!institutionUid) {
+      return res.status(400).json({
+        success: false,
+        message: 'This institute record does not contain an institution UID.',
+      })
+    }
+
+    const [cleanupSummary, preservedAdmins] = await Promise.all([
+      removeInstituteData({ institutionUid }),
+      User.find({ role: 'instituteAdmin', institutionUid })
+        .select('_id name email institutionUid')
+        .lean(),
+    ])
+
+    institute.archivedAt = new Date()
+    await institute.save()
+
+    return res.status(200).json({
+      success: true,
+      message: 'Institute removed from the active list and institute data wiped successfully.',
+      data: {
+        institutionId: String(institute._id),
+        institutionUid,
+        institutionName: institute.institutionName || '',
+        preservedAdminAccounts: preservedAdmins.map((admin) => ({
+          id: String(admin._id),
+          name: admin.name || '',
+          email: admin.email || '',
+          institutionUid: admin.institutionUid || '',
+        })),
+        cleanupSummary,
+      },
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to remove institute.',
+      error: error.message,
+    })
+  }
+}
+
 module.exports = {
   createInstituteInvite,
   getInstituteInvites,
+  removeInstitute,
   resendInstituteInvite,
 }

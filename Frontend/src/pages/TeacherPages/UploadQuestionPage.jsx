@@ -110,7 +110,7 @@ function UploadQuestionPage() {
   }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[1.35fr,1fr]">
+    <div className="grid gap-5">
       <SectionCard>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

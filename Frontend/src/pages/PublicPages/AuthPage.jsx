@@ -227,17 +227,18 @@ function AuthPage({ mode }) {
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <a href="/" className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600">
-            AutoPaper
-          </a>
-          <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
-            {authTitle}
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">{authSubtitle}</p>
+      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 2xl:grid-cols-[minmax(0,0.95fr)_minmax(28rem,1.05fr)] 2xl:items-center">
+        <section className="min-w-0 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="w-full max-w-2xl">
+            <a href="/" className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600">
+              AutoPaper
+            </a>
+            <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+              {authTitle}
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">{authSubtitle}</p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-600">Invite first</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -251,53 +252,54 @@ function AuthPage({ mode }) {
                 If you forget your password, we can send a reset link to your email and get you back in quickly.
               </p>
             </div>
-          </div>
+            </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href={mode === 'login' ? getRegisterPathForRole(role) : getLoginPathForRole(role)}
-              className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-            >
-              {mode === 'login' ? 'Need an account?' : 'Already have an account?'}
-            </a>
-            <a
-              href={getLoginPathForRole('Admin')}
-              className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700"
-            >
-              System Admin Login
-            </a>
-          </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href={mode === 'login' ? getRegisterPathForRole(role) : getLoginPathForRole(role)}
+                className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              >
+                {mode === 'login' ? 'Need an account?' : 'Already have an account?'}
+              </a>
+              <a
+                href={getLoginPathForRole('Admin')}
+                className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-700"
+              >
+                System Admin Login
+              </a>
+            </div>
 
-          <div className="mt-10 grid gap-3">
-            {[
-              { label: 'Dashboard-style UI', detail: 'Same surfaces, spacing, and typography as the logged-in app.' },
-              { label: 'Role aware routing', detail: 'Teachers, institute admins, and admins all get the right entry point.' },
-              { label: 'Simple recovery', detail: 'Forgot-password and reset flows follow the same clean theme.' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                <div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-indigo-600" />
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{item.label}</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">{item.detail}</p>
+            <div className="mt-10 grid gap-3">
+              {[
+                { label: 'Dashboard-style UI', detail: 'Same surfaces, spacing, and typography as the logged-in app.' },
+                { label: 'Role aware routing', detail: 'Teachers, institute admins, and admins all get the right entry point.' },
+                { label: 'Simple recovery', detail: 'Forgot-password and reset flows follow the same clean theme.' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                  <div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-indigo-600" />
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">{item.label}</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">{item.detail}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="flex items-center justify-center">
-          <div className="w-full max-w-2xl">
+        <section className="flex min-w-0 items-center justify-center">
+          <div className="w-full max-w-2xl min-w-0">
             <SectionCard>
               <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 text-slate-900">
                 <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
+                  <div className="min-w-0 max-w-2xl">
                     <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-600">
                       {mode === 'login' ? 'Login' : 'Register'}
                     </p>
                     <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
                       {getRoleLabel(role)} access
                     </h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                       {mode === 'login'
                         ? 'Authenticate with your email and password, or continue with Google.'
                         : 'Enter the registration code from your invite, then create your own password or finish with Google.'}

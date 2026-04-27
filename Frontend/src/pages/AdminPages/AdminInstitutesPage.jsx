@@ -5,6 +5,7 @@ import StatusBanner from '../../components/StatusBanner'
 import { formatLongDateTime, formatShortDate } from '../../utils/instituteFormatters'
 import {
   createInstituteInvite,
+  deleteInstitute,
   getInstituteInvites,
   resendInstituteInvite,
 } from '../../api/admin'
@@ -45,6 +46,7 @@ function AdminInstitutesPage() {
   const [status, setStatus] = useState({ type: '', message: '' })
   const [submittingAction, setSubmittingAction] = useState('')
   const [resendingId, setResendingId] = useState('')
+  const [removingInstituteId, setRemovingInstituteId] = useState('')
   const [state, setState] = useState(initialState)
 
   const loadInvites = async () => {
@@ -164,6 +166,41 @@ function AdminInstitutesPage() {
       })
     } finally {
       setResendingId('')
+    }
+  }
+
+  const handleRemoveInstitute = async (invite) => {
+    if (!invite?.id) {
+      return
+    }
+
+    const confirmed = window.confirm(
+      `Remove ${invite.institutionName}? This will wipe all teachers, questions, invites, notifications, and institute activity for ${invite.institutionUid}. The institute admin credentials will be preserved.`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setRemovingInstituteId(invite.id)
+
+    try {
+      await deleteInstitute(invite.id)
+      setState((current) => ({
+        ...current,
+        data: current.data.filter((row) => row.id !== invite.id),
+      }))
+      setStatus({
+        type: 'success',
+        message: `${invite.institutionName} was removed and its institute data was wiped.`,
+      })
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Failed to remove institute.',
+      })
+    } finally {
+      setRemovingInstituteId('')
     }
   }
 
@@ -315,7 +352,7 @@ function AdminInstitutesPage() {
               {state.data.map((invite) => (
                 <article
                   key={invite.id}
-                  className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-[1.4fr,1fr,0.9fr,0.9fr]"
+                  className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-[1.4fr,1fr,0.9fr,1.15fr]"
                 >
                   <div>
                     <p className="text-sm font-bold text-slate-900">{invite.institutionName}</p>
@@ -345,14 +382,24 @@ function AdminInstitutesPage() {
                     <p className="text-xs text-slate-500">
                       {invite.inviteSentAtLabel ? `Sent ${invite.inviteSentAtLabel}` : 'Not sent yet'}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => handleResend(invite)}
-                      disabled={resendingId === invite.id}
-                      className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {resendingId === invite.id ? 'Sending...' : invite.inviteStatus === 'draft' ? 'Send' : 'Resend'}
-                    </button>
+                    <div className="flex flex-wrap gap-2 sm:justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleResend(invite)}
+                        disabled={resendingId === invite.id || removingInstituteId === invite.id}
+                        className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {resendingId === invite.id ? 'Sending...' : invite.inviteStatus === 'draft' ? 'Send' : 'Resend'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveInstitute(invite)}
+                        disabled={removingInstituteId === invite.id || resendingId === invite.id}
+                        className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {removingInstituteId === invite.id ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
                   </div>
                 </article>
               ))}

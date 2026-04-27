@@ -8,6 +8,8 @@ export const getInstituteActivity = (params) => api.get('/activity', { params })
 
 export const getInstituteTeachers = (params) => api.get('/teachers', { params })
 
+export const deleteInstituteTeacher = (teacherId) => api.delete(`/teachers/${teacherId}`)
+
 export const getInstituteInvites = (params) => api.get('/invites', { params })
 
 export const resendInstituteInvite = (inviteId) => api.post(`/invites/${inviteId}/resend`)

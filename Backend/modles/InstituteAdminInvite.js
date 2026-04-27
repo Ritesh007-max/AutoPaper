@@ -14,6 +14,7 @@ const instituteAdminInviteSchema = new mongoose.Schema({
   inviteSentAt: { type: Date },
   lastSentAt: { type: Date },
   expiresAt: { type: Date },
+  archivedAt: { type: Date, default: null },
 }, {
   timestamps: true,
 })

@@ -3,6 +3,7 @@ const Question = require('../modles/Questions')
 const InstituteActivity = require('../modles/InstituteActivity')
 const InstituteInvite = require('../modles/InstituteInvite')
 const { generateTeacherUid, normalizeUidBase } = require('../utils/institutionUid')
+const { removeTeacherData } = require('../utils/dataRemoval')
 const { sendTeacherInvitationEmail } = require('../utils/teacherInvitationMailer')
 
 const getScopedInstitutionUid = (req) => String(req.user?.institutionUid || '').trim()
@@ -513,11 +514,53 @@ const resendInvite = async (req, res) => {
   }
 }
 
+const deleteTeacher = async (req, res) => {
+  try {
+    const { id } = req.params
+    const institutionUid = getScopedInstitutionUid(req)
+    const teacher = await User.findOne({
+      _id: id,
+      role: 'teacher',
+      institutionUid,
+    }).select('_id name email teacherUid institutionUid')
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: 'Teacher not found.',
+      })
+    }
+
+    const cleanupSummary = await removeTeacherData({ teacher, institutionUid })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Teacher and associated institute data removed successfully.',
+      data: {
+        teacher: {
+          id: String(teacher._id),
+          name: teacher.name || '',
+          email: teacher.email || '',
+          teacherUid: teacher.teacherUid || '',
+        },
+        cleanupSummary,
+      },
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to remove teacher.',
+      error: error.message,
+    })
+  }
+}
+
 module.exports = {
   getActivity,
   getDashboardStats,
   getInvites,
   getTeachers,
   createTeacher,
+  deleteTeacher,
   resendInvite,
 }

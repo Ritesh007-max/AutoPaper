@@ -54,6 +54,31 @@ function SidebarIcon({ type, active = false }) {
         <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
+    teachers: (
+      <svg {...commonProps}>
+        <path d="M17 20h5v-1a4 4 0 00-4-4h-1" />
+        <path d="M9 20H4v-1a4 4 0 014-4h1" />
+        <circle cx="9" cy="7" r="4" />
+        <circle cx="17" cy="9" r="3" />
+      </svg>
+    ),
+    activity: (
+      <svg {...commonProps}>
+        <path d="M3 12h4l3-7 4 14 3-7h4" />
+      </svg>
+    ),
+    invites: (
+      <svg {...commonProps}>
+        <path d="M4 6h16v12H4z" />
+        <path d="M4 8l8 5 8-5" />
+      </svg>
+    ),
+    notifications: (
+      <svg {...commonProps}>
+        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" />
+        <path d="M9 17a3 3 0 006 0" />
+      </svg>
+    ),
     settings: (
       <svg {...commonProps}>
         <circle cx="12" cy="12" r="3" />
@@ -82,99 +107,151 @@ const normalizeTeacherNotification = (notification = {}) => ({
   createdAtLabel: formatRelativeTime(notification.sentAt || notification.createdAt),
 })
 
-export function TeacherSidebar({ navItems, activeKey }) {
-  return (
-    <aside className="fixed inset-y-0 left-0 hidden w-[260px] flex-col border-r border-slate-200 bg-white transition-all xl:flex">
-      {/* Brand */}
-      <div className="flex items-center gap-3 px-6 py-8">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-200">
-          <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+export function TeacherSidebar({
+  navItems,
+  activeKey,
+  mobileOpen = false,
+  onClose = () => {},
+  brandTitle = 'EduSaaS',
+  brandSubtitle = 'AI Exam Engine',
+  workspaceTitle = 'Active workspace',
+  workspaceSubtitle = 'Connected teacher profile',
+  workspaceInitials = 'AP',
+  workspaceAccentClassName = 'bg-orange-100',
+  workspaceInitialsClassName = 'text-orange-600',
+}) {
+  const adminNavItems = navItems.filter((item) => item.adminOnly)
+
+  useEffect(() => {
+    if (typeof document === 'undefined' || !mobileOpen) {
+      return undefined
+    }
+
+    const { overflow } = document.body.style
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = overflow
+    }
+  }, [mobileOpen])
+
+  const renderNavItem = (item) => {
+    const active = item.key === activeKey
+    const sharedClassName = `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+      active
+        ? 'bg-blue-50 text-blue-600'
+        : 'text-slate-600 hover:bg-slate-50'
+    } ${item.disabled ? 'cursor-not-allowed opacity-50' : ''}`
+
+    if (item.disabled) {
+      return (
+        <button
+          key={item.key}
+          type="button"
+          disabled
+          title="Coming soon"
+          className={sharedClassName}
+        >
+          <SidebarIcon type={item.icon} active={active} />
+          {item.label}
+        </button>
+      )
+    }
+
+    return (
+      <a
+        key={item.key}
+        href={item.href}
+        onClick={onClose}
+        className={sharedClassName}
+      >
+        <SidebarIcon type={item.icon} active={active} />
+        {item.label}
+      </a>
+    )
+  }
+
+  const renderSidebarContent = ({ mobile = false } = {}) => (
+    <>
+      <div className="flex items-center justify-between gap-3 px-6 py-8">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-200">
+            <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">{brandTitle}</h1>
+            <p className="text-xs font-semibold text-slate-400">{brandSubtitle}</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">EduSaaS</h1>
-          <p className="text-xs font-semibold text-slate-400">AI Exam Engine</p>
-        </div>
+
+        {mobile ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        ) : null}
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 space-y-1.5 px-4 pt-4">
-        {navItems.filter(item => !item.adminOnly).map((item) => {
-          const active = item.key === activeKey
-          const sharedClassName = `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
-            active
-              ? 'bg-blue-50 text-blue-600'
-              : 'text-slate-600 hover:bg-slate-50'
-          } ${item.disabled ? 'cursor-not-allowed opacity-50' : ''}`
+        {navItems.filter((item) => !item.adminOnly).map(renderNavItem)}
 
-          if (item.disabled) {
-            return (
-              <button
-                key={item.key}
-                type="button"
-                disabled
-                title="Coming soon"
-                className={sharedClassName}
-              >
-                <SidebarIcon type={item.icon} active={active} />
-                {item.label}
-              </button>
-            )
-          }
+        {adminNavItems.length ? (
+          <>
+            <div className="mt-8 px-4 pb-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Administration</p>
+            </div>
 
-          return (
-            <a
-              key={item.key}
-              href={item.href}
-              className={sharedClassName}
-            >
-              <SidebarIcon type={item.icon} active={active} />
-              {item.label}
-            </a>
-          )
-        })}
-
-        <div className="mt-8 px-4 pb-2">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Administration</p>
-        </div>
-        
-        {navItems.filter(item => item.adminOnly).map((item) => {
-          const active = item.key === activeKey
-          return (
-            <a
-              key={item.key}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
-                active 
-                  ? 'bg-blue-50 text-blue-600' 
-                  : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <SidebarIcon type={item.icon} active={active} />
-              {item.label}
-            </a>
-          )
-        })}
+            {adminNavItems.map(renderNavItem)}
+          </>
+        ) : null}
       </nav>
 
-      {/* User info */}
       <div className="border-t border-slate-100 p-4">
         <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-100">
-            <span className="text-sm font-bold text-orange-600">AP</span>
+          <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${workspaceAccentClassName}`}>
+            <span className={`text-sm font-bold ${workspaceInitialsClassName}`}>{workspaceInitials}</span>
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="truncate text-sm font-bold text-slate-900">Active workspace</p>
-            <p className="truncate text-xs font-medium text-slate-500">Connected teacher profile</p>
+            <p className="truncate text-sm font-bold text-slate-900">{workspaceTitle}</p>
+            <p className="truncate text-xs font-medium text-slate-500">{workspaceSubtitle}</p>
           </div>
         </div>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      <aside className="fixed inset-y-0 left-0 hidden w-[260px] flex-col border-r border-slate-200 bg-white transition-all xl:flex">
+        {renderSidebarContent()}
+      </aside>
+
+      {mobileOpen ? (
+        <div className="fixed inset-0 z-50 xl:hidden">
+          <button
+            type="button"
+            aria-label="Close navigation overlay"
+            onClick={onClose}
+            className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]"
+          />
+          <aside className="relative flex h-full w-[280px] max-w-[85vw] flex-col border-r border-slate-200 bg-white shadow-2xl">
+            {renderSidebarContent({ mobile: true })}
+          </aside>
+        </div>
+      ) : null}
+    </>
   )
 }
 
-export function TeacherTopbar() {
+export function TeacherTopbar({ onOpenSidebar = () => {} }) {
   const [notificationsState, setNotificationsState] = useState({
     loading: true,
     error: '',
@@ -298,22 +375,36 @@ export function TeacherTopbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-slate-100 bg-white/80 px-8 backdrop-blur-md">
-      <div className="relative w-full max-w-[500px]">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-          <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </span>
-        <input
-          type="text"
-          placeholder="Search questions, papers, or tags..."
-          className="h-12 w-full rounded-2xl border-0 bg-slate-100 pl-11 pr-4 text-sm font-medium text-slate-600 ring-0 transition-all focus:bg-white focus:ring-2 focus:ring-blue-100"
-        />
-      </div>
+    <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <button
+            type="button"
+            onClick={onOpenSidebar}
+            aria-label="Open navigation menu"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 xl:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
 
-      <div className="flex items-center gap-5">
-        <div className="relative" ref={menuRef}>
+          <div className="relative min-w-0 flex-1 sm:max-w-[500px]">
+            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Search questions, papers, or tags..."
+              className="h-12 w-full rounded-2xl border-0 bg-slate-100 pl-11 pr-4 text-sm font-medium text-slate-600 ring-0 transition-all focus:bg-white focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-3 sm:gap-4">
+          <div className="relative" ref={menuRef}>
           <button
             type="button"
             onClick={handleToggleMenu}
@@ -332,7 +423,7 @@ export function TeacherTopbar() {
           </button>
 
           {menuOpen ? (
-            <div className="absolute right-0 top-12 w-[370px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_30px_60px_rgba(15,23,42,0.18)]">
+            <div className="absolute right-0 top-12 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_30px_60px_rgba(15,23,42,0.18)] sm:w-[370px]">
               <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Notifications</p>
@@ -412,24 +503,25 @@ export function TeacherTopbar() {
               </div>
             </div>
           ) : null}
+          </div>
+          <button
+            className="hidden h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400 sm:flex"
+            disabled
+            title="Quick generate is coming soon"
+            type="button"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Quick Generate
+          </button>
+          <a
+            href="/logout"
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            Logout
+          </a>
         </div>
-        <button
-          className="flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
-          disabled
-          title="Quick generate is coming soon"
-          type="button"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Quick Generate
-        </button>
-        <a
-          href="/logout"
-          className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-        >
-          Logout
-        </a>
       </div>
     </header>
   )
