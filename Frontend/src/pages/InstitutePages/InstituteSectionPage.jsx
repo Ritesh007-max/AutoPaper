@@ -2,6 +2,7 @@ import InstituteDashboard from './InstituteDashboard'
 import InstituteTeachersPage from './InstituteTeachersPage'
 import InstituteActivityPage from './InstituteActivityPage'
 import InstituteInvitesPage from './InstituteInvitesPage'
+import InstituteNotificationsPage from './InstituteNotificationsPage'
 
 const instituteRoutes = {
   '/institute': { key: 'dashboard', component: InstituteDashboard },
@@ -14,6 +15,8 @@ const instituteRoutes = {
   '/institute/activity': { key: 'activity', component: InstituteActivityPage },
   '/invites': { key: 'invites', component: InstituteInvitesPage },
   '/institute/invites': { key: 'invites', component: InstituteInvitesPage },
+  '/notifications': { key: 'notifications', component: InstituteNotificationsPage },
+  '/institute/notifications': { key: 'notifications', component: InstituteNotificationsPage },
 }
 
 function InstituteSectionPage() {

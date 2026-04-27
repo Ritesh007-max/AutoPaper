@@ -4,7 +4,7 @@ import SectionCard from '../../components/SectionCard'
 import InstituteLayout from '../../components/InstituteLayout'
 import { SectionHeader, TeacherSnapshotTable } from '../../components/InstituteDashboardUi'
 import { formatNumber, formatRelativeTime } from '../../utils/instituteFormatters'
-import { getInstituteTeachers } from '../../api/institute'
+import { deleteInstituteTeacher, getInstituteTeachers } from '../../api/institute'
 
 const initialState = {
   loading: true,
@@ -24,6 +24,8 @@ const normalizeTeacher = (teacher = {}) => ({
 
 function InstituteTeachersPage() {
   const [state, setState] = useState(initialState)
+  const [status, setStatus] = useState({ type: '', message: '' })
+  const [removingTeacherId, setRemovingTeacherId] = useState('')
 
   useEffect(() => {
     let active = true
@@ -63,6 +65,42 @@ function InstituteTeachersPage() {
     }
   }, [])
 
+  const handleRemoveTeacher = async (teacher) => {
+    if (!teacher?.id) {
+      return
+    }
+
+    const confirmed = window.confirm(
+      `Remove ${teacher.name || 'this teacher'}? This will permanently delete the teacher account, their questions, notifications, invite record, and related institute activity.`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setRemovingTeacherId(teacher.id)
+    setStatus({ type: '', message: '' })
+
+    try {
+      await deleteInstituteTeacher(teacher.id)
+      setState((current) => ({
+        ...current,
+        data: current.data.filter((row) => row.id !== teacher.id),
+      }))
+      setStatus({
+        type: 'success',
+        message: `${teacher.name || 'Teacher'} was removed and their institute data was deleted.`,
+      })
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Failed to remove teacher.',
+      })
+    } finally {
+      setRemovingTeacherId('')
+    }
+  }
+
   return (
     <InstituteLayout
       activeKey="teachers"
@@ -78,8 +116,26 @@ function InstituteTeachersPage() {
             action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(state.data.length)} teachers`}</p>}
           />
 
+          {status.message ? (
+            <div
+              className={`mt-6 rounded-2xl border px-4 py-3 text-sm ${
+                status.type === 'error'
+                  ? 'border-rose-200 bg-rose-50 text-rose-700'
+                  : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              }`}
+            >
+              {status.message}
+            </div>
+          ) : null}
+
           <div className="mt-6">
-            <TeacherSnapshotTable teachers={state.data} loading={state.loading} error={state.error} />
+            <TeacherSnapshotTable
+              teachers={state.data}
+              loading={state.loading}
+              error={state.error}
+              onRemove={handleRemoveTeacher}
+              removingTeacherId={removingTeacherId}
+            />
           </div>
         </SectionCard>
       </div>

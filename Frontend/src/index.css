@@ -1,15 +1,59 @@
 @import "tailwindcss";
 
+@theme {
+  --font-lexend: "Lexend", sans-serif;
+  --font-h1: "Lexend";
+  --font-caption: "Lexend";
+  --font-body-md: "Lexend";
+  --font-h3: "Lexend";
+  --font-label-sm: "Lexend";
+  --font-body-lg: "Lexend";
+  --font-h2: "Lexend";
+
+  --color-brand-purple: #A708FC;
+  --color-primary: #5d5f5f;
+  --color-secondary: #8700cd;
+  --color-tertiary: #1C1E30;
+
+  --color-surface: #f8f9ff;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-dim: #cbdbf5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-highest: #d3e4fe;
+  
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #444748;
+  --color-on-background: #0b1c30;
+  --color-error: #ba1a1a;
+
+  --spacing-xs: 4px;
+  --spacing-base: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 40px;
+  --spacing-xl: 64px;
+  --spacing-gutter: 24px;
+  --spacing-margin: 32px;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
 :root {
-  --tp-primary: #3B82F6;
-  --tp-primary-strong: #2563EB;
-  --tp-primary-soft: #EFF6FF;
-  --tp-secondary: #F8FAFC;
-  --tp-text: #1F2937;
-  --tp-text-muted: #6B7280;
-  --tp-border: #E2E8F0;
-  --tp-surface: #F8FAFC;
-  --tp-card: #FFFFFF;
+  --tp-primary: var(--color-brand-purple);
+  --tp-primary-strong: var(--color-secondary);
+  --tp-primary-soft: #f4daff;
+  --tp-secondary: var(--color-surface-container-high);
+  --tp-text: var(--color-on-surface);
+  --tp-text-muted: var(--color-on-surface-variant);
+  --tp-border: #c4c7c8;
+  --tp-surface: var(--color-surface);
+  --tp-card: var(--color-surface-container-lowest);
 }
 
 html,
@@ -22,15 +66,20 @@ body {
   margin: 0;
   background-color: var(--tp-surface);
   color: var(--tp-text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Lexend', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.01em;
+}
+
+/* Material Symbols configuration */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 /* Custom shadow for cards */
 .shadow-soft {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  box-shadow: 0 4px 12px rgba(167, 8, 252, 0.05);
 }
 
 .shadow-card {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+  box-shadow: 0 10px 25px -3px rgba(167, 8, 252, 0.08), 0 4px 6px -2px rgba(167, 8, 252, 0.02);
 }

@@ -9,6 +9,7 @@ import {
   resendInstituteInvite,
 } from '../../api/institute'
 import { formatNumber, formatShortDate } from '../../utils/instituteFormatters'
+import { getStoredAuth } from '../../utils/auth'
 
 const INSTITUTE_UID_STORAGE_KEY = 'autoPaper.institutionUid'
 
@@ -21,6 +22,11 @@ const initialState = {
 const getInitialInstitutionUid = () => {
   if (typeof window === 'undefined') {
     return ''
+  }
+
+  const authInstitutionUid = getStoredAuth()?.user?.institutionUid?.trim()
+  if (authInstitutionUid) {
+    return authInstitutionUid
   }
 
   const searchParams = new URLSearchParams(window.location.search)
@@ -36,10 +42,11 @@ const getInitialInstitutionUid = () => {
 const defaultTeacherForm = {
   name: '',
   email: '',
-  password: '',
   role: 'teacher',
   institutionUid: getInitialInstitutionUid(),
 }
+
+const initialInstitutionUid = defaultTeacherForm.institutionUid
 
 const normalizeInvite = (invite = {}) => ({
   id: invite.id || invite._id || invite.email || crypto.randomUUID(),
@@ -70,14 +77,13 @@ function InstituteInvitesPage() {
   const [teacherAction, setTeacherAction] = useState('')
   const teacherUidPreview = `${deriveTeacherUidBase(teacherForm.institutionUid)}-XXXXXX`
 
-  const loadInvites = async () => {
+  const loadInvites = async (institutionUid = '') => {
     setState((current) => ({
       ...current,
       loading: true,
     }))
 
     try {
-      const institutionUid = teacherForm.institutionUid.trim()
       const response = await getInstituteInvites(institutionUid ? { institutionUid } : undefined)
       const payload = response.data?.data
       const invites = Array.isArray(payload) ? payload.map(normalizeInvite) : []
@@ -97,7 +103,7 @@ function InstituteInvitesPage() {
   }
 
   useEffect(() => {
-    loadInvites()
+    loadInvites(initialInstitutionUid)
   }, [])
 
   useEffect(() => {
@@ -127,16 +133,17 @@ function InstituteInvitesPage() {
 
   const submitTeacherForm = async (sendEmail) => {
     const payload = {
-      ...teacherForm,
+      name: teacherForm.name.trim(),
+      email: teacherForm.email.trim(),
       role: 'teacher',
       institutionUid: teacherForm.institutionUid.trim(),
       sendEmail,
     }
 
-    if (!payload.name.trim() || !payload.email.trim() || !payload.password.trim()) {
+    if (!payload.name || !payload.email) {
       setTeacherFormStatus({
         type: 'error',
-        message: 'Name, email, and password are required.',
+        message: 'Name and email are required.',
       })
       return
     }
@@ -150,28 +157,18 @@ function InstituteInvitesPage() {
     try {
       const response = await createInstituteTeacher(payload)
       const teacherUid = response.data?.data?.teacherUid
-      const inviteStatus = response.data?.data?.inviteStatus
       const message = sendEmail
-        ? `Teacher saved and invitation email sent. UID: ${teacherUid || 'generated'}`
-        : `Teacher saved successfully. UID: ${teacherUid || 'generated'}`
+        ? `Teacher invite sent successfully. Registration code: ${teacherUid || 'generated'}`
+        : `Teacher invite saved successfully. Registration code: ${teacherUid || 'generated'}`
 
       setTeacherFormStatus({
         type: 'success',
         message,
       })
 
-      if (sendEmail) {
-        await loadInvites()
-      }
+      await loadInvites(payload.institutionUid)
 
       resetTeacherForm()
-
-      if (inviteStatus) {
-        setState((current) => ({
-          ...current,
-          error: '',
-        }))
-      }
     } catch (error) {
       setTeacherFormStatus({
         type: 'error',
@@ -183,7 +180,7 @@ function InstituteInvitesPage() {
   }
 
   const handleResend = async (invite) => {
-    if (!invite?.id || invite.status !== 'pending') {
+    if (!invite?.id || invite.status === 'accepted') {
       return
     }
 
@@ -191,8 +188,11 @@ function InstituteInvitesPage() {
 
     try {
       await resendInstituteInvite(invite.id)
-      await loadInvites()
-      setTeacherFormStatus({ type: 'success', message: 'Teacher invite resent successfully.' })
+      await loadInvites(teacherForm.institutionUid.trim())
+      setTeacherFormStatus({
+        type: 'success',
+        message: invite.status === 'draft' ? 'Teacher invite sent successfully.' : 'Teacher invite resent successfully.',
+      })
     } catch (error) {
       setTeacherFormStatus({
         type: 'error',
@@ -203,13 +203,13 @@ function InstituteInvitesPage() {
     }
   }
 
-  const pendingCount = state.data.filter((invite) => invite.status === 'pending').length
+  const openInviteCount = state.data.filter((invite) => invite.status !== 'accepted').length
 
   return (
     <InstituteLayout
       activeKey="invites"
       title="Invite Teachers"
-      description="Create a teacher record, send the login email, and keep the invite queue visible in one place."
+      description="Create a teacher invite, send the registration code by email, and keep the invite queue visible in one place."
     >
       <div className="space-y-6">
         <section className="grid gap-6 xl:grid-cols-[0.92fr,1.08fr]">
@@ -217,7 +217,7 @@ function InstituteInvitesPage() {
             <SectionHeader
               eyebrow="Teacher invite"
               title="Add a teacher"
-              description="Create a teacher record now and optionally send the login UID by email."
+              description="Create a teacher invite now and optionally send the registration code by email."
             />
 
             <div className="mt-6 space-y-4">
@@ -248,18 +248,6 @@ function InstituteInvitesPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Temporary Password</span>
-                  <input
-                    name="password"
-                    type="password"
-                    value={teacherForm.password}
-                    onChange={handleTeacherFormChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
-                    placeholder="Set a temp password"
-                  />
-                </label>
-
-                <label className="space-y-2">
                   <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Role</span>
                   <input
                     name="role"
@@ -279,9 +267,11 @@ function InstituteInvitesPage() {
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
                   placeholder="Enter or auto-fill institute UID"
                 />
-                <p className="text-xs text-slate-500">The teacher UID is derived from this institute UID on the server.</p>
+                <p className="text-xs text-slate-500">
+                  The registration code is generated from this institute UID and the teacher email.
+                </p>
                 <p className="text-xs font-semibold text-slate-700">
-                  Derived UID preview: <span className="font-black text-slate-900">{teacherUidPreview}</span>
+                  Code preview: <span className="font-black text-slate-900">{teacherUidPreview}</span>
                 </p>
               </label>
 
@@ -304,7 +294,7 @@ function InstituteInvitesPage() {
                   disabled={teacherAction === 'save'}
                   className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {teacherAction === 'save' ? 'Saving...' : 'Save'}
+                  {teacherAction === 'save' ? 'Saving...' : 'Save Draft'}
                 </button>
                 <button
                   type="button"
@@ -312,7 +302,7 @@ function InstituteInvitesPage() {
                   disabled={teacherAction === 'send'}
                   className="rounded-full bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {teacherAction === 'send' ? 'Sending...' : 'Send'}
+                  {teacherAction === 'send' ? 'Sending...' : 'Send Invite'}
                 </button>
                 <button
                   type="button"
@@ -328,9 +318,9 @@ function InstituteInvitesPage() {
           <SectionCard>
             <SectionHeader
               eyebrow="Invitation queue"
-              title="Pending invites"
-              description="Resend invitations when a teacher has not yet joined the institute."
-              action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(pendingCount)} pending`}</p>}
+              title="Open invites"
+              description="Send or resend invitations until the teacher joins the institute."
+              action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(openInviteCount)} open`}</p>}
             />
 
             <div className="mt-6">

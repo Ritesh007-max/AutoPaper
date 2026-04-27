@@ -1,7 +1,9 @@
+const InstituteAdminInvite = require('../modles/InstituteAdminInvite')
 const User = require('../modles/Users')
 const {
   generateInstitutionUid,
 } = require('../utils/institutionUid')
+const { removeInstituteData } = require('../utils/dataRemoval')
 const {
   sendInstituteInvitationEmail,
 } = require('../utils/instituteInvitationMailer')
@@ -20,11 +22,12 @@ const buildInstituteInviteRows = (institutes) =>
   institutes.map((institute) => ({
     id: String(institute._id),
     institutionName: institute.institutionName || 'Unnamed Institute',
-    adminName: institute.name || 'Unnamed Admin',
-    adminEmail: institute.email || '',
+    adminName: institute.adminName || 'Unnamed Admin',
+    adminEmail: institute.adminEmail || '',
     institutionUid: institute.institutionUid || '',
     inviteStatus: institute.inviteStatus || 'draft',
     inviteSentAt: institute.inviteSentAt || null,
+    resendCount: institute.resendCount || 0,
     createdAt: institute.createdAt || null,
   }))
 
@@ -39,10 +42,10 @@ const getErrorMessage = (error) => {
 const getInstituteInvites = async (req, res) => {
   try {
     const limit = parseLimit(req.query.limit, 10)
-    const institutes = await User.find({ role: 'instituteAdmin' })
+    const institutes = await InstituteAdminInvite.find({ archivedAt: null })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .select('name email institutionName institutionUid inviteStatus inviteSentAt createdAt')
+      .select('adminName adminEmail institutionName institutionUid inviteStatus inviteSentAt resendCount createdAt')
       .lean()
 
     return res.status(200).json({
@@ -65,7 +68,6 @@ const createInstituteInvite = async (req, res) => {
       institutionName,
       adminName,
       adminEmail,
-      password,
       institutionUid,
       sendEmail = false,
     } = req.body || {}
@@ -73,7 +75,6 @@ const createInstituteInvite = async (req, res) => {
     const trimmedInstitutionName = String(institutionName || '').trim()
     const trimmedAdminName = String(adminName || '').trim()
     const trimmedAdminEmail = String(adminEmail || '').trim().toLowerCase()
-    const trimmedPassword = String(password || '').trim()
     const resolvedInstitutionUid = String(institutionUid || '').trim() || generateInstitutionUid(trimmedInstitutionName, trimmedAdminEmail)
 
     if (!trimmedInstitutionName) {
@@ -97,17 +98,10 @@ const createInstituteInvite = async (req, res) => {
       })
     }
 
-    if (!trimmedPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password is required.',
-      })
-    }
-
-    const existingInstitute = await User.findOne({
+    const existingInstitute = await InstituteAdminInvite.findOne({
       $or: [
-        { email: trimmedAdminEmail, role: 'instituteAdmin' },
-        { institutionUid: resolvedInstitutionUid, role: 'instituteAdmin' },
+        { adminEmail: trimmedAdminEmail },
+        { institutionUid: resolvedInstitutionUid },
       ],
     })
 
@@ -121,11 +115,9 @@ const createInstituteInvite = async (req, res) => {
     const inviteStatus = 'draft'
     const inviteSentAt = undefined
 
-    const institute = new User({
-      name: trimmedAdminName,
-      email: trimmedAdminEmail,
-      password: trimmedPassword,
-      role: 'instituteAdmin',
+    const institute = new InstituteAdminInvite({
+      adminName: trimmedAdminName,
+      adminEmail: trimmedAdminEmail,
       institutionName: trimmedInstitutionName,
       institutionUid: resolvedInstitutionUid,
       inviteStatus,
@@ -147,6 +139,8 @@ const createInstituteInvite = async (req, res) => {
 
         institute.inviteStatus = 'sent'
         institute.inviteSentAt = new Date()
+        institute.lastSentAt = new Date()
+        institute.resendCount = 0
         await institute.save()
       } catch (emailError) {
         return res.status(502).json({
@@ -156,11 +150,12 @@ const createInstituteInvite = async (req, res) => {
           data: {
             id: institute._id,
             institutionName: institute.institutionName,
-            adminName: institute.name,
-            adminEmail: institute.email,
+            adminName: institute.adminName,
+            adminEmail: institute.adminEmail,
             institutionUid: institute.institutionUid,
             inviteStatus: institute.inviteStatus,
             inviteSentAt: institute.inviteSentAt || null,
+            resendCount: institute.resendCount || 0,
             emailDispatch,
           },
         })
@@ -175,11 +170,12 @@ const createInstituteInvite = async (req, res) => {
       data: {
         id: institute._id,
         institutionName: institute.institutionName,
-        adminName: institute.name,
-        adminEmail: institute.email,
+        adminName: institute.adminName,
+        adminEmail: institute.adminEmail,
         institutionUid: institute.institutionUid,
         inviteStatus: institute.inviteStatus,
         inviteSentAt: institute.inviteSentAt,
+        resendCount: institute.resendCount || 0,
         emailDispatch,
       },
     })
@@ -195,7 +191,7 @@ const createInstituteInvite = async (req, res) => {
 const resendInstituteInvite = async (req, res) => {
   try {
     const { id } = req.params
-    const institute = await User.findOne({ _id: id, role: 'instituteAdmin' })
+    const institute = await InstituteAdminInvite.findById(id)
 
     if (!institute) {
       return res.status(404).json({
@@ -208,14 +204,16 @@ const resendInstituteInvite = async (req, res) => {
 
     try {
       emailDispatch = await sendInstituteInvitationEmail({
-        email: institute.email,
-        adminName: institute.name,
+        email: institute.adminEmail,
+        adminName: institute.adminName,
         institutionName: institute.institutionName,
         institutionUid: institute.institutionUid,
       })
 
       institute.inviteStatus = 'sent'
       institute.inviteSentAt = new Date()
+      institute.lastSentAt = new Date()
+      institute.resendCount = (institute.resendCount || 0) + 1
       await institute.save()
     } catch (emailError) {
       return res.status(502).json({
@@ -225,11 +223,12 @@ const resendInstituteInvite = async (req, res) => {
         data: {
           id: String(institute._id),
           institutionName: institute.institutionName,
-          adminName: institute.name,
-          adminEmail: institute.email,
+          adminName: institute.adminName,
+          adminEmail: institute.adminEmail,
           institutionUid: institute.institutionUid,
           inviteStatus: institute.inviteStatus,
           inviteSentAt: institute.inviteSentAt || null,
+          resendCount: institute.resendCount || 0,
           emailDispatch,
         },
       })
@@ -241,11 +240,12 @@ const resendInstituteInvite = async (req, res) => {
       data: {
         id: String(institute._id),
         institutionName: institute.institutionName,
-        adminName: institute.name,
-        adminEmail: institute.email,
+        adminName: institute.adminName,
+        adminEmail: institute.adminEmail,
         institutionUid: institute.institutionUid,
         inviteStatus: institute.inviteStatus,
         inviteSentAt: institute.inviteSentAt,
+        resendCount: institute.resendCount || 0,
         emailDispatch,
       },
     })
@@ -258,8 +258,65 @@ const resendInstituteInvite = async (req, res) => {
   }
 }
 
+const removeInstitute = async (req, res) => {
+  try {
+    const { id } = req.params
+    const institute = await InstituteAdminInvite.findOne({ _id: id, archivedAt: null })
+
+    if (!institute) {
+      return res.status(404).json({
+        success: false,
+        message: 'Institute not found.',
+      })
+    }
+
+    const institutionUid = String(institute.institutionUid || '').trim()
+
+    if (!institutionUid) {
+      return res.status(400).json({
+        success: false,
+        message: 'This institute record does not contain an institution UID.',
+      })
+    }
+
+    const [cleanupSummary, preservedAdmins] = await Promise.all([
+      removeInstituteData({ institutionUid }),
+      User.find({ role: 'instituteAdmin', institutionUid })
+        .select('_id name email institutionUid')
+        .lean(),
+    ])
+
+    institute.archivedAt = new Date()
+    await institute.save()
+
+    return res.status(200).json({
+      success: true,
+      message: 'Institute removed from the active list and institute data wiped successfully.',
+      data: {
+        institutionId: String(institute._id),
+        institutionUid,
+        institutionName: institute.institutionName || '',
+        preservedAdminAccounts: preservedAdmins.map((admin) => ({
+          id: String(admin._id),
+          name: admin.name || '',
+          email: admin.email || '',
+          institutionUid: admin.institutionUid || '',
+        })),
+        cleanupSummary,
+      },
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to remove institute.',
+      error: error.message,
+    })
+  }
+}
+
 module.exports = {
   createInstituteInvite,
   getInstituteInvites,
+  removeInstitute,
   resendInstituteInvite,
 }

@@ -5,6 +5,7 @@ import StatusBanner from '../../components/StatusBanner'
 import { formatLongDateTime, formatShortDate } from '../../utils/instituteFormatters'
 import {
   createInstituteInvite,
+  deleteInstitute,
   getInstituteInvites,
   resendInstituteInvite,
 } from '../../api/admin'
@@ -13,7 +14,6 @@ const initialForm = {
   institutionName: '',
   adminName: '',
   adminEmail: '',
-  password: '',
   institutionUid: '',
 }
 
@@ -46,6 +46,7 @@ function AdminInstitutesPage() {
   const [status, setStatus] = useState({ type: '', message: '' })
   const [submittingAction, setSubmittingAction] = useState('')
   const [resendingId, setResendingId] = useState('')
+  const [removingInstituteId, setRemovingInstituteId] = useState('')
   const [state, setState] = useState(initialState)
 
   const loadInvites = async () => {
@@ -92,7 +93,6 @@ function AdminInstitutesPage() {
     institutionName: form.institutionName.trim(),
     adminName: form.adminName.trim(),
     adminEmail: form.adminEmail.trim(),
-    password: form.password.trim(),
     institutionUid: form.institutionUid.trim(),
     sendEmail,
   })
@@ -108,10 +108,6 @@ function AdminInstitutesPage() {
 
     if (!payload.adminEmail) {
       return 'Admin email is required.'
-    }
-
-    if (!payload.password) {
-      return 'Password is required.'
     }
 
     return ''
@@ -173,16 +169,59 @@ function AdminInstitutesPage() {
     }
   }
 
+  const handleRemoveInstitute = async (invite) => {
+    if (!invite?.id) {
+      return
+    }
+
+    const confirmed = window.confirm(
+      `Remove ${invite.institutionName}? This will wipe all teachers, questions, invites, notifications, and institute activity for ${invite.institutionUid}. The institute admin credentials will be preserved.`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setRemovingInstituteId(invite.id)
+
+    try {
+      await deleteInstitute(invite.id)
+      setState((current) => ({
+        ...current,
+        data: current.data.filter((row) => row.id !== invite.id),
+      }))
+      setStatus({
+        type: 'success',
+        message: `${invite.institutionName} was removed and its institute data was wiped.`,
+      })
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Failed to remove institute.',
+      })
+    } finally {
+      setRemovingInstituteId('')
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-500">Admin Console</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Institute Invitations</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Create and manage institute admin invites from one place. This keeps the onboarding flow focused while we add
-            more admin screens later.
-          </p>
+          <div className="max-w-3xl">
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Institute Invitations</h1>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Create and manage institute admin invites from one place. The invite email contains the registration code,
+              and the institute admin sets their own password when they register.
+            </p>
+          </div>
+          <a
+            href="/logout"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+          >
+            Logout
+          </a>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[0.95fr,1.05fr]">
@@ -238,20 +277,6 @@ function AdminInstitutesPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Temporary Password
-                  </span>
-                  <input
-                    name="password"
-                    type="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
-                    placeholder="Set a temp password"
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                     Institute UID
                   </span>
                   <input
@@ -271,7 +296,7 @@ function AdminInstitutesPage() {
                   disabled={submittingAction === 'save'}
                   className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {submittingAction === 'save' ? 'Saving...' : 'Save'}
+                  {submittingAction === 'save' ? 'Saving...' : 'Save Draft'}
                 </button>
                 <button
                   type="button"
@@ -279,7 +304,7 @@ function AdminInstitutesPage() {
                   disabled={submittingAction === 'send'}
                   className="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {submittingAction === 'send' ? 'Sending...' : 'Send'}
+                  {submittingAction === 'send' ? 'Sending...' : 'Send Invite'}
                 </button>
                 <button
                   type="button"
@@ -327,7 +352,7 @@ function AdminInstitutesPage() {
               {state.data.map((invite) => (
                 <article
                   key={invite.id}
-                  className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-[1.4fr,1fr,0.9fr,0.9fr]"
+                  className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-[1.4fr,1fr,0.9fr,1.15fr]"
                 >
                   <div>
                     <p className="text-sm font-bold text-slate-900">{invite.institutionName}</p>
@@ -357,14 +382,24 @@ function AdminInstitutesPage() {
                     <p className="text-xs text-slate-500">
                       {invite.inviteSentAtLabel ? `Sent ${invite.inviteSentAtLabel}` : 'Not sent yet'}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => handleResend(invite)}
-                      disabled={resendingId === invite.id}
-                      className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {resendingId === invite.id ? 'Sending...' : invite.inviteStatus === 'draft' ? 'Send' : 'Resend'}
-                    </button>
+                    <div className="flex flex-wrap gap-2 sm:justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleResend(invite)}
+                        disabled={resendingId === invite.id || removingInstituteId === invite.id}
+                        className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {resendingId === invite.id ? 'Sending...' : invite.inviteStatus === 'draft' ? 'Send' : 'Resend'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveInstitute(invite)}
+                        disabled={removingInstituteId === invite.id || resendingId === invite.id}
+                        className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {removingInstituteId === invite.id ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
                   </div>
                 </article>
               ))}

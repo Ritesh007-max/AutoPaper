@@ -18,11 +18,11 @@ function QuestionExamples({ selectedType }) {
 
   if (!selectedExample) {
     return (
-      <div className="flex min-h-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-8 text-center">
-        <div>
+      <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60">
+        <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Paper Preview</p>
           <h2 className="mt-2 text-xl font-black text-slate-900">Question Format Example</h2>
-          <p className="mt-4 max-w-md text-sm leading-6 text-slate-600">
+          <p className="mt-4 text-sm leading-6 text-slate-600">
             Select a question type in the form to see the recommended input format.
           </p>
         </div>
@@ -31,14 +31,14 @@ function QuestionExamples({ selectedType }) {
   }
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-5xl min-w-0">
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Paper Preview</p>
       <h2 className="mt-2 text-xl font-black text-slate-900">Question Format Example</h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
         Use this sample as a guide for how the selected question type should be entered in the form.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 w-full">
         <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-100">
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
@@ -49,7 +49,7 @@ function QuestionExamples({ selectedType }) {
 
           <p className="mt-2 text-sm leading-6 text-slate-600">{selectedExample.description}</p>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="mt-4 grid gap-3 xl:grid-cols-2">
             <ExampleBlock label="Question Text" value={selectedExample.example.questionText} />
             <ExampleBlock label="Subject" value={selectedExample.example.subject} />
             <ExampleBlock label="Chapter" value={selectedExample.example.chapter} />

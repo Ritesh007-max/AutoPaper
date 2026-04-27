@@ -89,6 +89,7 @@ export function SectionHeader({ eyebrow, title, description, action }) {
 export function StatusBadge({ status }) {
   const normalized = String(status || '').toLowerCase()
   const styles = {
+    draft: 'bg-amber-50 text-amber-700 ring-amber-100',
     pending: 'bg-amber-50 text-amber-700 ring-amber-100',
     accepted: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
     expired: 'bg-slate-100 text-slate-600 ring-slate-200',
@@ -176,26 +177,38 @@ export function ActivityList({ items, loading = false, error = '', emptyTitle = 
   )
 }
 
-export function TeacherSnapshotTable({ teachers, loading = false, error = '' }) {
+export function TeacherSnapshotTable({
+  teachers,
+  loading = false,
+  error = '',
+  onRemove,
+  removingTeacherId = '',
+}) {
+  const hasActions = typeof onRemove === 'function'
+
   if (loading) {
     return (
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-        <div className="grid grid-cols-4 gap-4 border-b border-slate-100 bg-slate-50 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-          <span>Name</span>
-          <span>Questions</span>
-          <span>Papers</span>
-          <span>Last Active</span>
-        </div>
-        <div className="space-y-3 p-5">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 rounded-2xl border border-slate-100 px-4 py-4">
-              <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
-              <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
-              <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
-              <div className="h-4 w-2/3 animate-pulse rounded bg-slate-100" />
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-3">
+                <div className="h-5 w-40 animate-pulse rounded bg-slate-100" />
+                <div className="h-4 w-56 animate-pulse rounded bg-slate-100" />
+              </div>
+              {hasActions ? <div className="h-10 w-24 animate-pulse rounded-full bg-slate-100" /> : null}
             </div>
-          ))}
-        </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {Array.from({ length: 3 }).map((__, metricIndex) => (
+                <div key={metricIndex} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
+                  <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                  <div className="mt-3 h-5 w-12 animate-pulse rounded bg-slate-200" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
@@ -214,27 +227,50 @@ export function TeacherSnapshotTable({ teachers, loading = false, error = '' }) 
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-      <div className="grid grid-cols-[1.6fr,0.8fr,0.8fr,1fr] gap-4 border-b border-slate-100 bg-slate-50 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-        <span>Name</span>
-        <span>Questions</span>
-        <span>Papers</span>
-        <span>Last Active</span>
-      </div>
-
-      <div className="divide-y divide-slate-100">
-        {teachers.map((teacher) => (
-          <div key={teacher.id} className="grid grid-cols-[1.6fr,0.8fr,0.8fr,1fr] gap-4 px-5 py-4">
-            <div>
-              <p className="text-sm font-bold text-slate-900">{teacher.name}</p>
-              {teacher.email ? <p className="mt-1 text-xs text-slate-500">{teacher.email}</p> : null}
+    <div className="space-y-4">
+      {teachers.map((teacher) => (
+        <article
+          key={teacher.id}
+          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <p className="text-lg font-black text-slate-900">{teacher.name}</p>
+              {teacher.email ? <p className="mt-1 break-all text-sm text-slate-500">{teacher.email}</p> : null}
             </div>
-            <p className="text-sm font-semibold text-slate-700">{teacher.questionsAdded}</p>
-            <p className="text-sm font-semibold text-slate-700">{teacher.papersGenerated}</p>
-            <p className="text-sm font-semibold text-slate-700">{teacher.lastActiveLabel}</p>
+
+            {hasActions ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => onRemove(teacher)}
+                  disabled={removingTeacherId === teacher.id}
+                  className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {removingTeacherId === teacher.id ? 'Removing...' : 'Remove'}
+                </button>
+              </div>
+            ) : null}
           </div>
-        ))}
-      </div>
+
+          <div className={`mt-5 grid gap-3 ${hasActions ? 'xl:grid-cols-3' : 'md:grid-cols-3'}`}>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Questions</p>
+              <p className="mt-2 text-2xl font-black text-slate-900">{teacher.questionsAdded}</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Papers</p>
+              <p className="mt-2 text-2xl font-black text-slate-900">{teacher.papersGenerated}</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Last Active</p>
+              <p className="mt-2 text-base font-bold text-slate-900">{teacher.lastActiveLabel}</p>
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }
@@ -242,21 +278,27 @@ export function TeacherSnapshotTable({ teachers, loading = false, error = '' }) 
 export function InviteTable({ invites, loading = false, error = '', onResend, resendingId = '' }) {
   if (loading) {
     return (
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-        <div className="grid grid-cols-[1.6fr,0.8fr,0.8fr] gap-4 border-b border-slate-100 bg-slate-50 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-          <span>Email</span>
-          <span>Status</span>
-          <span>Action</span>
-        </div>
-        <div className="space-y-3 p-5">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="grid grid-cols-[1.6fr,0.8fr,0.8fr] gap-4 rounded-2xl border border-slate-100 px-4 py-4">
-              <div className="h-4 w-4/5 animate-pulse rounded bg-slate-100" />
-              <div className="h-4 w-20 animate-pulse rounded bg-slate-100" />
-              <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-3">
+                <div className="h-5 w-56 animate-pulse rounded bg-slate-100" />
+                <div className="h-4 w-32 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div className="h-10 w-24 animate-pulse rounded-full bg-slate-100" />
             </div>
-          ))}
-        </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {Array.from({ length: 3 }).map((__, metricIndex) => (
+                <div key={metricIndex} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
+                  <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                  <div className="mt-3 h-5 w-16 animate-pulse rounded bg-slate-200" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
@@ -275,39 +317,49 @@ export function InviteTable({ invites, loading = false, error = '', onResend, re
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-      <div className="grid grid-cols-[1.6fr,0.8fr,0.8fr] gap-4 border-b border-slate-100 bg-slate-50 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-        <span>Email</span>
-        <span>Status</span>
-        <span>Action</span>
-      </div>
+    <div className="space-y-4">
+      {invites.map((invite) => (
+        <article
+          key={invite.id}
+          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <p className="break-all text-lg font-black text-slate-900">{invite.email}</p>
+              {invite.teacherUid ? <p className="mt-1 text-sm text-slate-500">Teacher UID: {invite.teacherUid}</p> : null}
+            </div>
 
-      <div className="divide-y divide-slate-100">
-        {invites.map((invite) => (
-          <div key={invite.id} className="grid grid-cols-[1.6fr,0.8fr,0.8fr] gap-4 px-5 py-4">
-            <div>
-              <p className="text-sm font-bold text-slate-900">{invite.email}</p>
-              {invite.teacherUid ? <p className="mt-1 text-xs text-slate-500">Teacher UID: {invite.teacherUid}</p> : null}
-              <p className="mt-1 text-xs text-slate-500">
-                {invite.expiresAtLabel ? `Expires ${invite.expiresAtLabel}` : 'No expiry set'}
-              </p>
-            </div>
-            <div className="flex items-center">
+            <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={invite.status} />
-            </div>
-            <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => onResend?.(invite)}
-                disabled={invite.status !== 'pending' || resendingId === invite.id}
+                disabled={invite.status === 'accepted' || resendingId === invite.id}
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {resendingId === invite.id ? 'Sending...' : 'Resend'}
+                {resendingId === invite.id ? 'Sending...' : invite.status === 'draft' ? 'Send' : 'Resend'}
               </button>
             </div>
           </div>
-        ))}
-      </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="mt-2 text-base font-bold text-slate-900 capitalize">{invite.status}</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Expires</p>
+              <p className="mt-2 text-base font-bold text-slate-900">{invite.expiresAtLabel || 'No expiry set'}</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Resends</p>
+              <p className="mt-2 text-2xl font-black text-slate-900">{invite.resendCount || 0}</p>
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }
