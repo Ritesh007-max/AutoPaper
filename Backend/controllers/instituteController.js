@@ -1,6 +1,7 @@
 const User = require('../modles/Users')
 const Question = require('../modles/Questions')
 const InstituteActivity = require('../modles/InstituteActivity')
+const InstituteAdminInvite = require('../modles/InstituteAdminInvite')
 const InstituteInvite = require('../modles/InstituteInvite')
 const { generateTeacherUid, normalizeUidBase } = require('../utils/institutionUid')
 const { removeTeacherData } = require('../utils/dataRemoval')
@@ -335,8 +336,12 @@ const createTeacher = async (req, res) => {
     const teacherUid = generateTeacherUid(normalizedInstituteUid, trimmedEmail)
     const inviteStatus = sendEmail ? 'sent' : 'draft'
     const inviteSentAt = sendEmail ? new Date() : undefined
+    const instituteRecord = await InstituteAdminInvite.findOne({
+      institutionUid: normalizedInstituteUid,
+    }).select('_id')
 
     const inviteRecord = new InstituteInvite({
+      institutionId: instituteRecord?._id,
       institutionUid: normalizedInstituteUid,
       name: trimmedName,
       email: trimmedEmail,
@@ -361,6 +366,7 @@ const createTeacher = async (req, res) => {
         })
 
         await InstituteActivity.create({
+          institutionId: instituteRecord?._id,
           institutionUid: normalizedInstituteUid,
           teacherName: trimmedName,
           type: 'invite_sent',
