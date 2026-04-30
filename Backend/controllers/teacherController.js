@@ -20,6 +20,15 @@ const requireInstitutionScope = (res, institutionUid) => {
   return false
 }
 
+const buildTeacherQuestionScope = (institutionUid) => ({
+  $or: [
+    { institutionUid },
+    { institutionUid: { $exists: false } },
+    { institutionUid: null },
+    { institutionUid: '' },
+  ],
+})
+
 const normalizeStringValue = (value) => {
   if (typeof value !== 'string') {
     return value
@@ -178,7 +187,10 @@ const getQuestions = async (req, res) => {
       return
     }
 
-    let query = Question.find({ institutionUid, ...filters }).sort({ createdAt: -1 })
+    let query = Question.find({
+      ...buildTeacherQuestionScope(institutionUid),
+      ...filters,
+    }).sort({ createdAt: -1 })
 
     const hasLimit = hasOwn(req.query, 'limit') && req.query.limit !== ''
     const hasPage = hasOwn(req.query, 'page') && req.query.page !== ''
@@ -224,12 +236,14 @@ const getQuestionFilters = async (req, res) => {
       return
     }
 
+    const teacherQuestionScope = buildTeacherQuestionScope(institutionUid)
+
     const [subjects, chapters, grades, questionTypes, difficulties] = await Promise.all([
-      Question.distinct('subject', { institutionUid }),
-      Question.distinct('chapter', { institutionUid }),
-      Question.distinct('grade', { institutionUid }),
-      Question.distinct('questionType', { institutionUid }),
-      Question.distinct('difficulty', { institutionUid }),
+      Question.distinct('subject', teacherQuestionScope),
+      Question.distinct('chapter', teacherQuestionScope),
+      Question.distinct('grade', teacherQuestionScope),
+      Question.distinct('questionType', teacherQuestionScope),
+      Question.distinct('difficulty', teacherQuestionScope),
     ])
 
     const filterStringValues = (values) =>

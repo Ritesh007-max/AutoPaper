@@ -504,17 +504,15 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
             </div>
           ) : null}
           </div>
-          <button
-            className="hidden h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400 sm:flex"
-            disabled
-            title="Quick generate is coming soon"
-            type="button"
+          <a
+            href="/teacher/generate-paper"
+            className="hidden h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 sm:flex"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             Quick Generate
-          </button>
+          </a>
           <a
             href="/logout"
             className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"

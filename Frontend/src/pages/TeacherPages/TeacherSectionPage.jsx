@@ -6,6 +6,7 @@ import DeleteQuestionsPage from './DeleteQuestionsPage'
 import TeacherDashboardPage from './TeacherDashboardPage'
 import TeacherSettingsPage from './TeacherSettingsPage'
 import TeacherHistoryPage from './TeacherHistoryPage'
+import TeacherGeneratePaperPage from './TeacherGeneratePaperPage'
 import TeacherLayout from '../../components/TeacherLayout'
 
 const teacherRoutes = {
@@ -19,6 +20,7 @@ const teacherRoutes = {
   '/teacher/question-bank': { key: 'fetch-questions', component: FetchQuestionsPage },
   '/teacher/update-questions': { key: 'update-questions', component: UpdateQuestionsPage },
   '/teacher/delete-questions': { key: 'delete-questions', component: DeleteQuestionsPage },
+  '/teacher/generate-paper': { key: 'generate-paper', component: TeacherGeneratePaperPage },
   '/teacher/history': { key: 'history', component: TeacherHistoryPage },
   '/teacher/settings': { key: 'settings', component: TeacherSettingsPage },
 }
@@ -30,7 +32,7 @@ function TeacherSectionPage() {
     { key: 'upload-single-question', href: '/teacher/add-question', label: 'Add Question', icon: 'add-question' },
     { key: 'update-questions', href: '/teacher/update-questions', label: 'Update Questions', icon: 'settings' },
     { key: 'delete-questions', href: '/teacher/delete-questions', label: 'Delete Questions', icon: 'trash' },
-    { key: 'generate-paper', href: '#', label: 'Generate Paper', icon: 'generate-paper', disabled: true },
+    { key: 'generate-paper', href: '/teacher/generate-paper', label: 'Generate Paper', icon: 'generate-paper' },
     { key: 'history', href: '/teacher/history', label: 'History', icon: 'history' },
     { key: 'settings', href: '/teacher/settings', label: 'Settings', icon: 'settings', adminOnly: true },
   ]

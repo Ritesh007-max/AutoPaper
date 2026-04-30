@@ -12,7 +12,7 @@ const questionSchema = new mongoose.Schema({
   marks: { type: Number, required: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
-  institutionUid: { type: String },
+  institutionUid: { type: String, },
 }, {
   timestamps: true,
 })
