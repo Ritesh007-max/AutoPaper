@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 const instituteActivitySchema = new mongoose.Schema({
-  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
   institutionUid: { type: String },
   teacherId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   teacherName: { type: String },

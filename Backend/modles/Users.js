@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
   authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
   googleId: { type: String, unique: true, sparse: true },
   institutionName: { type: String },
-  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
   institutionUid: { type: String },
   teacherUid: { type: String, unique: true, sparse: true },
   inviteStatus: { type: String, enum: ['draft', 'sent'], default: 'draft' },

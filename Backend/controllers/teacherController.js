@@ -1,6 +1,5 @@
 const Question = require('../modles/Questions')
 const User = require('../modles/Users')
-const InstituteAdminInvite = require('../modles/InstituteAdminInvite')
 
 const allowedQuestionTypes = ['MCQ', 'short', 'long', 'numerical']
 const allowedDifficulties = ['easy', 'medium', 'hard']
@@ -22,8 +21,8 @@ const requireInstitutionScope = (res, institutionUid) => {
   return false
 }
 
-const requireQuestionOwnershipContext = (res, { institutionId, teacherUid }) => {
-  if (institutionId && teacherUid) {
+const requireQuestionOwnershipContext = (res, { institutionUid, teacherUid }) => {
+  if (institutionUid && teacherUid) {
     return true
   }
 
@@ -48,26 +47,15 @@ const resolveQuestionOwnershipContext = async (req) => {
   const userId = String(req.user?.userId || '').trim()
   const tokenInstitutionUid = String(req.user?.institutionUid || '').trim()
   const tokenTeacherUid = String(req.user?.teacherUid || '').trim()
-  const tokenInstitutionId = String(req.user?.institutionId || '').trim()
   const userRecord = userId
-    ? await User.findById(userId).select('institutionId institutionUid teacherUid').lean()
+    ? await User.findById(userId).select('institutionUid teacherUid').lean()
     : null
 
   const institutionUid = String(userRecord?.institutionUid || tokenInstitutionUid).trim()
   const teacherUid = String(userRecord?.teacherUid || tokenTeacherUid).trim()
-  let institutionId = userRecord?.institutionId || tokenInstitutionId || null
-
-  if (!institutionId && institutionUid) {
-    const instituteRecord = await InstituteAdminInvite.findOne({ institutionUid }).select('_id')
-    institutionId = instituteRecord?._id || null
-  }
 
   if (userId && userRecord) {
     const updates = {}
-
-    if (!userRecord.institutionId && institutionId) {
-      updates.institutionId = institutionId
-    }
 
     if (!userRecord.institutionUid && institutionUid) {
       updates.institutionUid = institutionUid
@@ -83,7 +71,6 @@ const resolveQuestionOwnershipContext = async (req) => {
   }
 
   return {
-    institutionId,
     institutionUid,
     teacherUid,
   }
@@ -343,7 +330,6 @@ const getQuestionFilters = async (req, res) => {
 const createQuestion = async (req, res) => {
   try {
     const {
-      institutionId,
       institutionUid,
       teacherUid,
     } = await resolveQuestionOwnershipContext(req)
@@ -352,12 +338,11 @@ const createQuestion = async (req, res) => {
       return
     }
 
-    if (!requireQuestionOwnershipContext(res, { institutionId, teacherUid })) {
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
       return
     }
 
     const payload = buildQuestionPayload(req.body)
-    payload.institutionId = institutionId
     payload.institutionUid = institutionUid
     payload.teacherUid = teacherUid
     payload.createdBy = req.user.userId
@@ -388,7 +373,6 @@ const createQuestion = async (req, res) => {
 const createQuestionsBulk = async (req, res) => {
   try {
     const {
-      institutionId,
       institutionUid,
       teacherUid,
     } = await resolveQuestionOwnershipContext(req)
@@ -397,7 +381,7 @@ const createQuestionsBulk = async (req, res) => {
       return
     }
 
-    if (!requireQuestionOwnershipContext(res, { institutionId, teacherUid })) {
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
       return
     }
 
@@ -410,7 +394,6 @@ const createQuestionsBulk = async (req, res) => {
 
     const payload = req.body.map((question) => ({
       ...buildQuestionPayload(question),
-      institutionId,
       institutionUid,
       teacherUid,
       createdBy: req.user.userId,

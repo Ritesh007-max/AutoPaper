@@ -82,7 +82,6 @@ const buildUserResponse = (user) => ({
   role: user.role,
   authProvider: user.authProvider || 'local',
   institutionName: user.institutionName || '',
-  institutionId: user.institutionId ? String(user.institutionId) : '',
   institutionUid: user.institutionUid || '',
   teacherUid: user.teacherUid || '',
   inviteStatus: user.inviteStatus || 'draft',
@@ -95,7 +94,6 @@ const signToken = (user) =>
       userId: String(user._id),
       role: user.role,
       email: user.email,
-      institutionId: user.institutionId ? String(user.institutionId) : '',
       institutionUid: user.institutionUid || '',
       teacherUid: user.teacherUid || '',
     },
@@ -180,16 +178,6 @@ const createTeacherAccount = async ({
     }
   }
 
-  let resolvedInstitutionId = invite.institutionId || null
-
-  if (!resolvedInstitutionId && invite.institutionUid) {
-    const instituteRecord = await InstituteAdminInvite.findOne({
-      institutionUid: invite.institutionUid,
-    }).select('_id')
-
-    resolvedInstitutionId = instituteRecord?._id || null
-  }
-
   const teacher = new User({
     name,
     email,
@@ -197,7 +185,6 @@ const createTeacherAccount = async ({
     role: 'teacher',
     authProvider,
     googleId,
-    institutionId: resolvedInstitutionId,
     institutionUid: invite.institutionUid,
     teacherUid: invite.teacherUid,
     inviteStatus: 'sent',
@@ -292,7 +279,6 @@ const createInstituteAdminAccount = async ({
     authProvider,
     googleId,
     institutionName: invite.institutionName,
-    institutionId: invite._id,
     institutionUid: invite.institutionUid,
     inviteStatus: 'sent',
     inviteSentAt: invite.inviteSentAt || invite.createdAt || new Date(),

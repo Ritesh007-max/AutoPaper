@@ -1,7 +1,6 @@
 const User = require('../modles/Users')
 const Question = require('../modles/Questions')
 const InstituteActivity = require('../modles/InstituteActivity')
-const InstituteAdminInvite = require('../modles/InstituteAdminInvite')
 const InstituteInvite = require('../modles/InstituteInvite')
 const { generateTeacherUid, normalizeUidBase } = require('../utils/institutionUid')
 const { removeTeacherData } = require('../utils/dataRemoval')
@@ -53,10 +52,10 @@ const loadInstituteData = async (institutionUid = '') => {
   const filter = institutionUid ? { institutionUid } : {}
 
     const [teachers, questions, activities, invites] = await Promise.all([
-    User.find({ role: 'teacher', ...filter }).select('name email teacherUid inviteStatus inviteSentAt createdAt updatedAt institutionId institutionUid').lean(),
-    Question.find(filter).select('createdBy subject chapter createdAt updatedAt institutionId institutionUid').lean(),
-    InstituteActivity.find(filter).select('teacherId teacherName type title detail createdAt updatedAt institutionId institutionUid').lean(),
-    InstituteInvite.find(filter).select('name teacherUid email status resendCount lastSentAt expiresAt createdAt updatedAt institutionId institutionUid').lean(),
+    User.find({ role: 'teacher', ...filter }).select('name email teacherUid inviteStatus inviteSentAt createdAt updatedAt institutionUid').lean(),
+    Question.find(filter).select('createdBy subject chapter createdAt updatedAt institutionUid').lean(),
+    InstituteActivity.find(filter).select('teacherId teacherName type title detail createdAt updatedAt institutionUid').lean(),
+    InstituteInvite.find(filter).select('name teacherUid email status resendCount lastSentAt expiresAt createdAt updatedAt institutionUid').lean(),
   ])
 
   return {
@@ -336,12 +335,8 @@ const createTeacher = async (req, res) => {
     const teacherUid = generateTeacherUid(normalizedInstituteUid, trimmedEmail)
     const inviteStatus = sendEmail ? 'sent' : 'draft'
     const inviteSentAt = sendEmail ? new Date() : undefined
-    const instituteRecord = await InstituteAdminInvite.findOne({
-      institutionUid: normalizedInstituteUid,
-    }).select('_id')
 
     const inviteRecord = new InstituteInvite({
-      institutionId: instituteRecord?._id,
       institutionUid: normalizedInstituteUid,
       name: trimmedName,
       email: trimmedEmail,
@@ -366,7 +361,6 @@ const createTeacher = async (req, res) => {
         })
 
         await InstituteActivity.create({
-          institutionId: instituteRecord?._id,
           institutionUid: normalizedInstituteUid,
           teacherName: trimmedName,
           type: 'invite_sent',

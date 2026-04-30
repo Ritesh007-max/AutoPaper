@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 const instituteInviteSchema = new mongoose.Schema({
-  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution' },
   institutionUid: { type: String },
   email: { type: String, required: true, trim: true },
   name: { type: String, trim: true },

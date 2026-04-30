@@ -293,7 +293,7 @@ const removeInstitute = async (req, res) => {
       success: true,
       message: 'Institute removed from the active list and institute data wiped successfully.',
       data: {
-        institutionId: String(institute._id),
+        id: String(institute._id),
         institutionUid,
         institutionName: institute.institutionName || '',
         preservedAdminAccounts: preservedAdmins.map((admin) => ({
