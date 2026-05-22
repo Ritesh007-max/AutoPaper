@@ -810,7 +810,9 @@ const handleGoogleAuthCallback = async (req, res) => {
     })
     const profile = await getGoogleProfile(tokenData.access_token)
 
-    if (!profile.email_verified) {
+    const isGoogleEmailVerified = profile.email_verified === true || profile.verified_email === true
+
+    if (!isGoogleEmailVerified) {
       return redirectWithAuthError(
         res,
         authMode,
