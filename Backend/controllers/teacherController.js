@@ -1,12 +1,11 @@
 const Question = require('../modles/Questions')
 const User = require('../modles/Users')
+const { normalizeUidBase } = require('../utils/institutionUid')
 
 const allowedQuestionTypes = ['MCQ', 'short', 'long', 'numerical']
 const allowedDifficulties = ['easy', 'medium', 'hard']
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
-
-const getScopedInstitutionUid = (req) => String(req.user?.institutionUid || '').trim()
 
 const requireInstitutionScope = (res, institutionUid) => {
   if (institutionUid) {
@@ -35,13 +34,11 @@ const requireQuestionOwnershipContext = (res, { institutionUid, teacherUid }) =>
 }
 
 const buildTeacherQuestionScope = (institutionUid) => ({
-  $or: [
-    { institutionUid },
-    { institutionUid: { $exists: false } },
-    { institutionUid: null },
-    { institutionUid: '' },
-  ],
+  institutionUid,
 })
+
+const getTeacherUidInstituteCode = (teacherUid) =>
+  normalizeUidBase(String(teacherUid || '').split('-')[0] || '')
 
 const resolveQuestionOwnershipContext = async (req) => {
   const userId = String(req.user?.userId || '').trim()
@@ -53,6 +50,8 @@ const resolveQuestionOwnershipContext = async (req) => {
 
   const institutionUid = String(userRecord?.institutionUid || tokenInstitutionUid).trim()
   const teacherUid = String(userRecord?.teacherUid || tokenTeacherUid).trim()
+  const institutionCode = normalizeUidBase(institutionUid)
+  const teacherInstitutionCode = getTeacherUidInstituteCode(teacherUid)
 
   if (userId && userRecord) {
     const updates = {}
@@ -71,9 +70,24 @@ const resolveQuestionOwnershipContext = async (req) => {
   }
 
   return {
+    institutionCode,
     institutionUid,
+    teacherInstitutionCode,
     teacherUid,
   }
+}
+
+const requireTeacherInstituteIsolation = (res, { institutionCode, teacherInstitutionCode }) => {
+  if (institutionCode && teacherInstitutionCode && institutionCode === teacherInstitutionCode) {
+    return true
+  }
+
+  res.status(403).json({
+    success: false,
+    message: 'Teacher access is restricted to questions from the teacher\'s own institute only.',
+  })
+
+  return false
 }
 
 const normalizeStringValue = (value) => {
@@ -94,7 +108,6 @@ const buildQuestionPayload = (source = {}) => {
     'subject',
     'chapter',
     'difficulty',
-    'institutionUid',
   ]
 
   for (const field of textFields) {
@@ -228,9 +241,22 @@ const sendRequestError = (res, message, error) => {
 const getQuestions = async (req, res) => {
   try {
     const filters = parseFiltersFromQuery(req.query)
-    const institutionUid = getScopedInstitutionUid(req)
+    const {
+      institutionCode,
+      institutionUid,
+      teacherInstitutionCode,
+      teacherUid,
+    } = await resolveQuestionOwnershipContext(req)
 
     if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
@@ -277,9 +303,22 @@ const getQuestions = async (req, res) => {
 
 const getQuestionFilters = async (req, res) => {
   try {
-    const institutionUid = getScopedInstitutionUid(req)
+    const {
+      institutionCode,
+      institutionUid,
+      teacherInstitutionCode,
+      teacherUid,
+    } = await resolveQuestionOwnershipContext(req)
 
     if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
@@ -330,7 +369,9 @@ const getQuestionFilters = async (req, res) => {
 const createQuestion = async (req, res) => {
   try {
     const {
+      institutionCode,
       institutionUid,
+      teacherInstitutionCode,
       teacherUid,
     } = await resolveQuestionOwnershipContext(req)
 
@@ -339,6 +380,10 @@ const createQuestion = async (req, res) => {
     }
 
     if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
@@ -373,7 +418,9 @@ const createQuestion = async (req, res) => {
 const createQuestionsBulk = async (req, res) => {
   try {
     const {
+      institutionCode,
       institutionUid,
+      teacherInstitutionCode,
       teacherUid,
     } = await resolveQuestionOwnershipContext(req)
 
@@ -382,6 +429,10 @@ const createQuestionsBulk = async (req, res) => {
     }
 
     if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
@@ -426,9 +477,22 @@ const createQuestionsBulk = async (req, res) => {
 const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params
-    const institutionUid = getScopedInstitutionUid(req)
+    const {
+      institutionCode,
+      institutionUid,
+      teacherInstitutionCode,
+      teacherUid,
+    } = await resolveQuestionOwnershipContext(req)
 
     if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
@@ -476,9 +540,22 @@ const updateQuestion = async (req, res) => {
 const deleteQuestion = async (req, res) => {
   try {
     const { id } = req.params
-    const institutionUid = getScopedInstitutionUid(req)
+    const {
+      institutionCode,
+      institutionUid,
+      teacherInstitutionCode,
+      teacherUid,
+    } = await resolveQuestionOwnershipContext(req)
 
     if (!requireInstitutionScope(res, institutionUid)) {
+      return
+    }
+
+    if (!requireQuestionOwnershipContext(res, { institutionUid, teacherUid })) {
+      return
+    }
+
+    if (!requireTeacherInstituteIsolation(res, { institutionCode, teacherInstitutionCode })) {
       return
     }
 
