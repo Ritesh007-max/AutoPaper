@@ -1,44 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduSpark</title>
     <link rel="stylesheet" href="paper.css">
     <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
+    
 </head>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".question-text, .math-render").forEach((element) => {
+      renderMathInElement(element, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false,
+        strict: false,
+        trust: false
+      });
+    });
+  });
+
+</script>
+
 <body>
    
-<form class="ff-ff" action="/download" method="get">
-    <button class="primary-btn">Download</button>
-</form><br><div class="pap-head">
-<img class="logo" src="https://image2url.com/r2/default/images/1774877777631-c38ec464-c4e5-4b44-8a74-48f22bb64834.jpeg"
- alt="logo">
-<h1>EduSpark</h1></div>
 
+<div class="head">
+  <img class="logo" src="https://image2url.com/r2/default/images/1774877777631-c38ec464-c4e5-4b44-8a74-48f22bb64834.jpeg"
+ alt="logo">
+<h1>EduSpark</h1>
+</div >
+
+<br>
+<form action="/download">
+<button  class="primary-btn">Download</button><br>
+</form>
+
+<div id="page-a"> 
+<div class="a4-page">
+  
 <%let i = 0%>
 <%for(let q of question){%>
 
     <%if(typeof q === 'string'){i=0%>
-    <h5><%= q %></h5>
+    <h4><%= q %></h4> <hr>
     <%}else{%>
-        <%if(q.questionType === "MCQ"){i=i+1;%>
-        <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3>
-        <p>(A)&nbsp;<%=q.options[0]%></p>
-        <p>(B)&nbsp;<%=q.options[1]%></p>
-        <p>(C)&nbsp;<%=q.options[2]%></p>
-        <p>(D)&nbsp;<%=q.options[3]%></p><br>
+        <%if(q.questionType === "MCQ" ||q.questionType === "1a" ){i=i+1;%>
+        <div class="question-text">(<%=i%>)&nbsp; <%- q.questionText %></div>
+        <div class="question-text">(A)&nbsp;<%-q.options[0]%></div>
+        <div class="question-text">(B)&nbsp;<%-q.options[1]%></div>
+        <div class="question-text">(C)&nbsp;<%-q.options[2]%></div>
+        <div class="question-text">(D)&nbsp;<%-q.options[3]%></div><br>
         
         <%}else{%>
            <% if(q.hasImage == "yes"){i=i+1;%>
-                <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3>
+                <div>(<%=i%>)&nbsp;<%=q.questionText%></div>
                 <img class="center" src="<%=q.image%>" alt="question image">  <br> 
             <%}else{%>
                 <%i=i+1;%>
-            <h3>(<%=i%>)&nbsp;<%=q.questionText%></h3><br>
+            <div  class="question-text math-render">(<%=i%>)&nbsp; <%- q.questionText %></div><br>
             <%}%>
             
 <%}}}%>
+
+</div>
+</div>
 
 </body>
 </html>

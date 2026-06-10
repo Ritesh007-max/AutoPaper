@@ -14,7 +14,7 @@ const contact = require("./routes/contact.js");
 app.engine("ejs", ejsMate); 
 app.set("view engine","ejs")
 app.set("views",path.join(__dirname,'./views/ejs'))
-app.use(express.static(path.join(__dirname,'./public')));
+app.use(express.static(path.join(__dirname,'./public/css')));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -32,10 +32,10 @@ app.use("/", home);
 app.use("/about", about);
 app.use("/contact", contact);
 
-let cqp = [];
+let cqp = []
 
 app.get("/paper",async (req,res)=>{
-    let qp = await generateqp()
+    let qp = await generateqp("science1")
     cqp = qp;
     res.render("index.ejs", { question: qp })
 })
@@ -43,6 +43,12 @@ app.get("/paper",async (req,res)=>{
 app.get("/download", async (req, res)=>{
     let qp = cqp;
     res.render("download.ejs", { question: qp });
+})
+
+app.get("/math",async (req,res)=>{
+    let qp= await generateqp("math-1")
+    cqp=qp;
+    res.render("index.ejs",{ question :qp})    
 })
 
 app.listen(8080,()=>{

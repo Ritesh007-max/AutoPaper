@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 
 const questionSchema = new mongoose.Schema({
   questionText: { type: String, required: true },
-  questionType: { type: String, enum: ['MCQ','obj', 'gr','1m', '2m', '3m','5m'], required: true },
+  questionType: { type: String, 
+    enum: ['MCQ','obj', 'gr','1m', '2m', '3m','5m','1a','1b','2a','2b','3a','3b','4','5'], required: true },
   options: [String],          // only filled for MCQ
   subject: { type: String, required: true },
   chapter: { type: Number, required: true },

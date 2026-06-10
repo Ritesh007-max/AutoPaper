@@ -1,0 +1,76 @@
+h1 {
+    text-align: center;
+}
+img{
+    text-align: center;
+}
+.center{
+    display: block;
+    height: 250px;
+    width: auto;
+    margin-left: 30vw;
+}
+
+.logo{
+  height: 50px;
+  width: auto;
+  margin-right: 30px;
+}
+
+.head{
+  margin: 0 auto;
+  width: 650px !important;
+  height: 100px;
+  width: 95vw;
+  border: 5px solid black;
+ display: flex;
+ justify-content: center;
+ align-items: center;}
+
+
+button{
+  background-color:crimson;
+  height: 2.5rem;
+  width: 6rem;
+  border-radius: 999px;
+  border: 2px solid maroon;
+  font-family:Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+ box-shadow: 0 2px 4px maroon;
+}
+button:hover{
+  scale: 1.2;
+  transition: all 0.5s ease-out ;
+}
+#page-a{
+  display: flex;
+  justify-content: center;
+}
+.a4-page{
+  width: 595px;
+  /* height: 842px; */
+  background-color: white;
+  border: 5px solid black;
+  padding: 10px;
+}
+
+.question-text {
+  line-height: 1.75;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.question-text .katex {
+  font-size: 1.05em;
+}
+
+.question-text .katex-display {
+  margin: 0.55rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: left;
+}
+
+.question-text .katex-display > .katex {
+  text-align: left;
+}

@@ -2,7 +2,10 @@
 const programForm = document.getElementById("programForm");
 const contactForm = document.getElementById("contactForm");
 
+
 const dropdownContainers = document.querySelectorAll(".custom-dropdown-container");
+
+
 
 dropdownContainers.forEach(container => {
   const dropdownHeader = container.querySelector(".dropdown-header");
@@ -84,3 +87,4 @@ if (contactForm) {
     contactForm.reset();
   });
 }
+
