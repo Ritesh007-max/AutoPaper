@@ -2,9 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 
-const app = require('./app')
-const connectDB = require('./Config/db')
-
 const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist')
 const frontendIndexPath = path.join(frontendDistPath, 'index.html')
 
@@ -42,6 +39,10 @@ const loadEnvFile = () => {
 const startServer = async () => {
   try {
     loadEnvFile()
+
+    const app = require('./app')
+    const connectDB = require('./Config/db')
+
     await connectDB()
 
     if (fs.existsSync(frontendIndexPath)) {
@@ -58,9 +59,13 @@ const startServer = async () => {
 
     const port = process.env.PORT || 3000
 
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
       console.log(`Server is running on port ${port}`)
     })
+
+    server.requestTimeout = 30 * 1000
+    server.headersTimeout = 10 * 1000
+    server.keepAliveTimeout = 5 * 1000
   } catch (error) {
     console.error('Failed to start server', error)
     process.exit(1)

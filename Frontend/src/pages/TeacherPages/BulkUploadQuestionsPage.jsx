@@ -3,7 +3,9 @@ import SectionCard from '../../components/SectionCard'
 import StatusBanner from '../../components/StatusBanner'
 import { createQuestionsBulk } from '../../api/questions'
 import { createQuestionSchemaPdfBlob } from '../../utils/questionSchemaPdf'
-import { validateQuestionsPdf } from '../../utils/pdfQuestionValidator'
+import { PDF_UPLOAD_LIMITS, validateQuestionsPdf } from '../../utils/pdfQuestionValidator'
+
+const formatUploadBytes = (bytes) => `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`
 
 function BulkUploadQuestionsPage() {
   const [selectedFile, setSelectedFile] = useState(null)
@@ -36,6 +38,16 @@ function BulkUploadQuestionsPage() {
       setStatus({
         type: 'error',
         message: 'Only PDF files are allowed for bulk upload.',
+      })
+      return
+    }
+
+    if (file.size > PDF_UPLOAD_LIMITS.maxFileBytes) {
+      setSelectedFile(null)
+      event.target.value = ''
+      setStatus({
+        type: 'error',
+        message: `PDF file must be ${formatUploadBytes(PDF_UPLOAD_LIMITS.maxFileBytes)} or smaller.`,
       })
       return
     }

@@ -1,10 +1,5 @@
 const getClientIp = (req) => {
-  const forwardedForHeader = req.headers['x-forwarded-for']
-
-  if (typeof forwardedForHeader === 'string' && forwardedForHeader.trim()) {
-    return forwardedForHeader.split(',')[0].trim()
-  }
-
+  // Express derives req.ip from the socket unless trust proxy is explicitly configured.
   return req.ip || req.socket?.remoteAddress || 'unknown'
 }
 
@@ -21,6 +16,7 @@ const pruneExpiredEntries = (store, now) => {
 const createRateLimiter = ({
   windowMs,
   max,
+  maxKeys = 10000,
   message = 'Too many requests. Please try again later.',
   keyGenerator = getClientIp,
 } = {}) => {
@@ -33,15 +29,32 @@ const createRateLimiter = ({
   }
 
   const store = new Map()
+  let lastPrunedAt = 0
+  const pruneIntervalMs = Math.min(windowMs, 60 * 1000)
 
   return (req, res, next) => {
     const now = Date.now()
-    pruneExpiredEntries(store, now)
+
+    if (now - lastPrunedAt >= pruneIntervalMs) {
+      pruneExpiredEntries(store, now)
+      lastPrunedAt = now
+    }
 
     const key = String(keyGenerator(req) || 'unknown')
     const currentEntry = store.get(key)
 
     if (!currentEntry || currentEntry.expiresAt <= now) {
+      if (!currentEntry && store.size >= maxKeys) {
+        pruneExpiredEntries(store, now)
+
+        if (store.size >= maxKeys) {
+          return res.status(429).json({
+            success: false,
+            message: 'Too many unique clients are sending requests. Please try again later.',
+          })
+        }
+      }
+
       store.set(key, {
         count: 1,
         expiresAt: now + windowMs,

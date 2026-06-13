@@ -1,6 +1,19 @@
 const allowedQuestionTypes = ['MCQ', 'short', 'long', 'numerical']
 const allowedDifficulty = ['easy', 'medium', 'hard']
 
+export const PDF_UPLOAD_LIMITS = {
+  maxCompressedStreamBytes: 1024 * 1024,
+  maxDecompressedStreamBytes: 2 * 1024 * 1024,
+  maxFileBytes: 5 * 1024 * 1024,
+  maxQuestions: 100,
+  maxStreamCount: 150,
+  maxTotalExtractedBytes: 3 * 1024 * 1024,
+}
+
+const formatBytes = (bytes) => `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`
+
+const createPdfLimitError = (message) => Object.assign(new Error(message), { isPdfLimitError: true })
+
 const decodePdfLiteralString = (raw) =>
   raw
     .replace(/\\\(/g, '(')
@@ -66,11 +79,46 @@ const decompressFlateStream = async (streamBytes) => {
 
   try {
     const decompressionStream = new DecompressionStream('deflate')
-    const decompressedBuffer = await new Response(
-      new Blob([streamBytes]).stream().pipeThrough(decompressionStream),
-    ).arrayBuffer()
-    return new Uint8Array(decompressedBuffer)
-  } catch {
+    const reader = new Blob([streamBytes])
+      .stream()
+      .pipeThrough(decompressionStream)
+      .getReader()
+    const chunks = []
+    let totalLength = 0
+
+    while (true) {
+      const { done, value } = await reader.read()
+
+      if (done) {
+        break
+      }
+
+      totalLength += value.length
+
+      if (totalLength > PDF_UPLOAD_LIMITS.maxDecompressedStreamBytes) {
+        reader.cancel().catch(() => {})
+        throw createPdfLimitError(
+          `A compressed PDF stream expands beyond ${formatBytes(PDF_UPLOAD_LIMITS.maxDecompressedStreamBytes)}.`,
+        )
+      }
+
+      chunks.push(value)
+    }
+
+    const decompressed = new Uint8Array(totalLength)
+    let offset = 0
+
+    for (const chunk of chunks) {
+      decompressed.set(chunk, offset)
+      offset += chunk.length
+    }
+
+    return decompressed
+  } catch (error) {
+    if (error?.isPdfLimitError) {
+      throw error
+    }
+
     return null
   }
 }
@@ -196,6 +244,8 @@ const extractTextFromCompressedStreams = async (pdfBytes) => {
   const pdfText = new TextDecoder('latin1').decode(pdfBytes)
   const streamRegex = /<<(.*?)>>\s*stream\r?\n/gs
   const extractedChunks = []
+  let streamCount = 0
+  let totalExtractedBytes = 0
   let match = streamRegex.exec(pdfText)
 
   while (match) {
@@ -222,9 +272,30 @@ const extractTextFromCompressedStreams = async (pdfBytes) => {
     }
 
     const streamBytes = pdfBytes.slice(streamStart, streamEnd)
+
+    streamCount += 1
+
+    if (streamCount > PDF_UPLOAD_LIMITS.maxStreamCount) {
+      throw createPdfLimitError(`PDF contains more than ${PDF_UPLOAD_LIMITS.maxStreamCount} compressed streams.`)
+    }
+
+    if (streamBytes.length > PDF_UPLOAD_LIMITS.maxCompressedStreamBytes) {
+      throw createPdfLimitError(
+        `A compressed PDF stream is larger than ${formatBytes(PDF_UPLOAD_LIMITS.maxCompressedStreamBytes)}.`,
+      )
+    }
+
     const decodedBytes = await decodeStreamByFilters(streamBytes, filters)
 
     if (decodedBytes) {
+      totalExtractedBytes += decodedBytes.length
+
+      if (totalExtractedBytes > PDF_UPLOAD_LIMITS.maxTotalExtractedBytes) {
+        throw createPdfLimitError(
+          `Extracted PDF text exceeds ${formatBytes(PDF_UPLOAD_LIMITS.maxTotalExtractedBytes)}.`,
+        )
+      }
+
       extractedChunks.push(new TextDecoder('latin1').decode(decodedBytes))
     }
 
@@ -342,6 +413,15 @@ const validateQuestion = (question, index) => {
 }
 
 export const validateQuestionsPdf = async (file) => {
+  if (file.size > PDF_UPLOAD_LIMITS.maxFileBytes) {
+    return {
+      isValid: false,
+      questionCount: 0,
+      questions: [],
+      errors: [`PDF file must be ${formatBytes(PDF_UPLOAD_LIMITS.maxFileBytes)} or smaller.`],
+    }
+  }
+
   const buffer = await file.arrayBuffer()
   const pdfBytes = new Uint8Array(buffer)
   const rawPdfText = new TextDecoder('latin1').decode(pdfBytes)
@@ -370,6 +450,15 @@ export const validateQuestionsPdf = async (file) => {
       questionCount: 0,
       questions: [],
       errors: ['No question blocks found. Use fields like questionText:, questionType:, subject:, grade:, difficulty:, marks:.'],
+    }
+  }
+
+  if (questions.length > PDF_UPLOAD_LIMITS.maxQuestions) {
+    return {
+      isValid: false,
+      questionCount: questions.length,
+      questions: [],
+      errors: [`PDF contains ${questions.length} questions. Upload at most ${PDF_UPLOAD_LIMITS.maxQuestions} at a time.`],
     }
   }
 

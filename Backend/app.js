@@ -9,6 +9,35 @@ const { apiLimiter } = require('./middleware/rateLimit')
 
 const app = express()
 
+const getTrustProxyValue = () => {
+  const configuredValue = String(process.env.TRUST_PROXY || '').trim()
+
+  if (!configuredValue) {
+    return false
+  }
+
+  if (configuredValue.toLowerCase() === 'true') {
+    return true
+  }
+
+  if (configuredValue.toLowerCase() === 'false') {
+    return false
+  }
+
+  const hopCount = Number.parseInt(configuredValue, 10)
+
+  if (String(hopCount) === configuredValue && hopCount >= 0) {
+    return hopCount
+  }
+
+  return configuredValue
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
+app.set('trust proxy', getTrustProxyValue())
+
 const getAllowedOrigins = () => {
   const configuredOrigins = String(
     process.env.CORS_ALLOWED_ORIGINS || process.env.FRONTEND_URL || '',
@@ -46,6 +75,13 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.options('/*path', cors(corsOptions))
 
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff')
+  res.set('X-Frame-Options', 'DENY')
+  res.set('Referrer-Policy', 'no-referrer')
+  next()
+})
+
 app.use(express.json({ limit: '1mb' }))
 
 app.use('/api', apiLimiter)
@@ -54,5 +90,16 @@ app.use('/api/auth', authRoutes)
 app.use('/api/teacher', teacherRoutes)
 app.use('/api/institute', instituteRoutes)
 app.use('/api/admin', adminRoutes)
+
+app.use((error, req, res, next) => {
+  if (error?.type === 'entity.too.large') {
+    return res.status(413).json({
+      success: false,
+      message: 'Request body is too large. Maximum JSON payload size is 1 MB.',
+    })
+  }
+
+  return next(error)
+})
 
 module.exports = app
