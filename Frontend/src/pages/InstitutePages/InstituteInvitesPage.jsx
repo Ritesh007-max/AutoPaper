@@ -223,24 +223,24 @@ function InstituteInvitesPage() {
             <div className="mt-6 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Name</span>
+                  <span className="block text-[12px] font-bold uppercase tracking-widest text-neutral">Name</span>
                   <input
                     name="name"
                     value={teacherForm.name}
                     onChange={handleTeacherFormChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
+                    className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-[14px] text-text-primary outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20"
                     placeholder="Teacher name"
                   />
                 </label>
 
                 <label className="space-y-2">
-                  <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Email</span>
+                  <span className="block text-[12px] font-bold uppercase tracking-widest text-neutral">Email</span>
                   <input
                     name="email"
                     type="email"
                     value={teacherForm.email}
                     onChange={handleTeacherFormChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
+                    className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-[14px] text-text-primary outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20"
                     placeholder="teacher@example.com"
                   />
                 </label>
@@ -248,36 +248,36 @@ function InstituteInvitesPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Role</span>
+                  <span className="block text-[12px] font-bold uppercase tracking-widest text-neutral">Role</span>
                   <input
                     name="role"
                     value="teacher"
                     readOnly
-                    className="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none"
+                    className="w-full cursor-not-allowed rounded-2xl border border-border bg-background px-4 py-3 text-[14px] text-text-secondary outline-none"
                   />
                 </label>
               </div>
 
               <label className="space-y-2">
-                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Institute UID</span>
+                <span className="block text-[12px] font-bold uppercase tracking-widest text-neutral">Institute UID</span>
                 <input
                   name="institutionUid"
                   value={teacherForm.institutionUid}
                   onChange={handleTeacherFormChange}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
+                  className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-[14px] text-text-primary outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20"
                   placeholder="Enter or auto-fill institute UID"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-[12px] text-neutral">
                   The registration code is generated from this institute UID and the teacher email.
                 </p>
-                <p className="text-xs font-semibold text-slate-700">
-                  Code preview: <span className="font-black text-slate-900">{teacherUidPreview}</span>
+                <p className="text-[12px] font-semibold text-text-secondary">
+                  Code preview: <span className="font-black text-text-primary">{teacherUidPreview}</span>
                 </p>
               </label>
 
               {teacherFormStatus.message ? (
                 <div
-                  className={`rounded-2xl border px-4 py-3 text-sm ${
+                  className={`rounded-2xl border px-4 py-3 text-[14px] ${
                     teacherFormStatus.type === 'error'
                       ? 'border-rose-200 bg-rose-50 text-rose-700'
                       : 'border-emerald-200 bg-emerald-50 text-emerald-700'
@@ -292,7 +292,7 @@ function InstituteInvitesPage() {
                   type="button"
                   onClick={() => submitTeacherForm(false)}
                   disabled={teacherAction === 'save'}
-                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full border border-border bg-surface px-5 py-2.5 text-[14px] font-semibold text-text-secondary transition hover:border-border hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {teacherAction === 'save' ? 'Saving...' : 'Save Draft'}
                 </button>
@@ -300,14 +300,14 @@ function InstituteInvitesPage() {
                   type="button"
                   onClick={() => submitTeacherForm(true)}
                   disabled={teacherAction === 'send'}
-                  className="rounded-full bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="rounded-full bg-primary px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {teacherAction === 'send' ? 'Sending...' : 'Send Invite'}
                 </button>
                 <button
                   type="button"
                   onClick={resetTeacherForm}
-                  className="rounded-full border border-transparent px-5 py-2.5 text-sm font-semibold text-slate-500 transition hover:text-slate-700"
+                  className="rounded-full border border-transparent px-5 py-2.5 text-[14px] font-semibold text-neutral transition hover:text-text-secondary"
                 >
                   Reset
                 </button>
@@ -320,7 +320,7 @@ function InstituteInvitesPage() {
               eyebrow="Invitation queue"
               title="Open invites"
               description="Send or resend invitations until the teacher joins the institute."
-              action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(openInviteCount)} open`}</p>}
+              action={<p className="text-[14px] font-semibold text-neutral">{state.loading ? 'Loading...' : `${formatNumber(openInviteCount)} open`}</p>}
             />
 
             <div className="mt-6">

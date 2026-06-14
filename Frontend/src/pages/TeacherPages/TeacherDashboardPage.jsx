@@ -165,14 +165,14 @@ function TeacherDashboardPage() {
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">Recent Questions</h2>
-            <a href="/teacher/history" className="text-sm font-bold text-blue-600 transition-colors hover:text-blue-700">
+            <h2 className="text-xl font-bold tracking-tight text-text-primary">Recent Questions</h2>
+            <a href="/teacher/history" className="text-[14px] font-bold text-blue-600 transition-colors hover:text-blue-700">
               View All
             </a>
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-soft">
-            <div className="grid grid-cols-[1.5fr,1fr,1fr,100px] gap-4 bg-slate-50/50 px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+          <div className="overflow-hidden rounded-3xl border border-border bg-surface shadow-soft">
+            <div className="grid grid-cols-[1.5fr,1fr,1fr,100px] gap-4 bg-surface/50 px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-neutral">
               <span>Question</span>
               <span>Subject</span>
               <span>Type</span>
@@ -184,25 +184,25 @@ function TeacherDashboardPage() {
                 recentQuestions.map((question) => (
                   <div
                     key={question._id}
-                    className="grid grid-cols-[1.5fr,1fr,1fr,100px] items-center gap-4 border-b border-slate-50 py-5 last:border-0 hover:bg-slate-50/50 px-4 transition-all"
+                    className="grid grid-cols-[1.5fr,1fr,1fr,100px] items-center gap-4 border-b border-slate-50 py-5 last:border-0 hover:bg-surface/50 px-4 transition-all"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-[15px] font-bold text-slate-900">
+                      <p className="truncate text-[15px] font-bold text-text-primary">
                         {question.questionText || 'Untitled question'}
                       </p>
-                      <p className="mt-0.5 text-xs font-semibold text-slate-400">
+                      <p className="mt-0.5 text-[12px] font-semibold text-neutral">
                         Grade {question.grade || 'N/A'}
                       </p>
                     </div>
-                    <div className="text-sm font-semibold text-slate-600">{question.subject || 'Unassigned'}</div>
-                    <div className="text-sm font-semibold text-slate-600">{question.questionType || 'Unknown'}</div>
-                    <div className="text-right text-xs font-semibold text-slate-500">
+                    <div className="text-[14px] font-semibold text-text-secondary">{question.subject || 'Unassigned'}</div>
+                    <div className="text-[14px] font-semibold text-text-secondary">{question.questionType || 'Unknown'}</div>
+                    <div className="text-right text-[12px] font-semibold text-neutral">
                       {formatRelativeTime(question.createdAt)}
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="px-8 py-10 text-sm text-slate-500">No questions have been loaded yet.</div>
+                <div className="px-8 py-10 text-[14px] text-neutral">No questions have been loaded yet.</div>
               )}
             </div>
           </div>
@@ -210,7 +210,7 @@ function TeacherDashboardPage() {
 
         <div className="space-y-10 lg:col-span-4">
           <div className="space-y-6">
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">Quick Actions</h2>
+            <h2 className="text-xl font-bold tracking-tight text-text-primary">Quick Actions</h2>
             <div className="grid gap-4">
               <ActionCard
                 label="Generate Paper"
@@ -236,7 +236,7 @@ function TeacherDashboardPage() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">Recently Added</h2>
+            <h2 className="text-xl font-bold tracking-tight text-text-primary">Recently Added</h2>
             <div className="space-y-6">
               {recentQuestions.length > 0 ? (
                 recentQuestions.map((question) => (
@@ -252,7 +252,7 @@ function TeacherDashboardPage() {
                   />
                 ))
               ) : (
-                <p className="text-sm text-slate-500">No recent questions to display.</p>
+                <p className="text-[14px] text-neutral">No recent questions to display.</p>
               )}
             </div>
           </div>

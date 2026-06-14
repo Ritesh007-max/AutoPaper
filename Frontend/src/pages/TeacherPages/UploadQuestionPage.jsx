@@ -114,16 +114,16 @@ function UploadQuestionPage() {
       <SectionCard>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Question Bank</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Create New Question</h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Question Bank</p>
+            <h1 className="mt-2 text-[30px] font-bold tracking-tight text-text-primary">Create New Question</h1>
+            <p className="mt-2 text-[14px] text-text-secondary">
               Configure your question with rich text style fields and metadata.
             </p>
           </div>
 
           <button
             type="button"
-            className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700"
+            className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[14px] font-semibold text-blue-700"
           >
             Generate with AI (Soon)
           </button>

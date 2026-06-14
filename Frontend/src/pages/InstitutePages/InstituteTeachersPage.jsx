@@ -113,12 +113,12 @@ function InstituteTeachersPage() {
             eyebrow="Teacher directory"
             title="Active teachers"
             description="These are the teachers currently represented in the institute snapshot."
-            action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(state.data.length)} teachers`}</p>}
+            action={<p className="text-[14px] font-semibold text-neutral">{state.loading ? 'Loading...' : `${formatNumber(state.data.length)} teachers`}</p>}
           />
 
           {status.message ? (
             <div
-              className={`mt-6 rounded-2xl border px-4 py-3 text-sm ${
+              className={`mt-6 rounded-2xl border px-4 py-3 text-[14px] ${
                 status.type === 'error'
                   ? 'border-rose-200 bg-rose-50 text-rose-700'
                   : 'border-emerald-200 bg-emerald-50 text-emerald-700'

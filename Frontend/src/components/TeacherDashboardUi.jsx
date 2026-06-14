@@ -8,7 +8,7 @@ import {
 import { formatRelativeTime } from '../utils/instituteFormatters'
 
 function SidebarIcon({ type, active = false }) {
-  const iconClassName = active ? 'text-blue-600' : 'text-slate-400'
+  const iconClassName = active ? 'text-primary' : 'text-neutral'
 
   const commonProps = {
     className: `h-5 w-5 ${iconClassName}`,
@@ -117,8 +117,8 @@ export function TeacherSidebar({
   workspaceTitle = 'Active workspace',
   workspaceSubtitle = 'Connected teacher profile',
   workspaceInitials = 'AP',
-  workspaceAccentClassName = 'bg-orange-100',
-  workspaceInitialsClassName = 'text-orange-600',
+  workspaceAccentClassName = 'bg-primary/20',
+  workspaceInitialsClassName = 'text-primary',
 }) {
   const adminNavItems = navItems.filter((item) => item.adminOnly)
 
@@ -137,10 +137,10 @@ export function TeacherSidebar({
 
   const renderNavItem = (item) => {
     const active = item.key === activeKey
-    const sharedClassName = `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
+    const sharedClassName = `flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-medium transition-all ${
       active
-        ? 'bg-blue-50 text-blue-600'
-        : 'text-slate-600 hover:bg-slate-50'
+        ? 'bg-primary/10 text-primary font-bold'
+        : 'text-text-secondary hover:bg-background'
     } ${item.disabled ? 'cursor-not-allowed opacity-50' : ''}`
 
     if (item.disabled) {
@@ -175,14 +175,14 @@ export function TeacherSidebar({
     <>
       <div className="flex items-center justify-between gap-3 px-6 py-8">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-200">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
             <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">{brandTitle}</h1>
-            <p className="text-xs font-semibold text-slate-400">{brandSubtitle}</p>
+            <h1 className="text-[20px] font-bold tracking-tight text-text-primary">{brandTitle}</h1>
+            <p className="text-[12px] font-semibold text-text-secondary">{brandSubtitle}</p>
           </div>
         </div>
 
@@ -191,7 +191,7 @@ export function TeacherSidebar({
             type="button"
             onClick={onClose}
             aria-label="Close navigation menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -206,7 +206,7 @@ export function TeacherSidebar({
         {adminNavItems.length ? (
           <>
             <div className="mt-8 px-4 pb-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Administration</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral">Administration</p>
             </div>
 
             {adminNavItems.map(renderNavItem)}
@@ -214,14 +214,14 @@ export function TeacherSidebar({
         ) : null}
       </nav>
 
-      <div className="border-t border-slate-100 p-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3">
+      <div className="border-t border-border p-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-background px-3 py-3">
           <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${workspaceAccentClassName}`}>
             <span className={`text-sm font-bold ${workspaceInitialsClassName}`}>{workspaceInitials}</span>
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="truncate text-sm font-bold text-slate-900">{workspaceTitle}</p>
-            <p className="truncate text-xs font-medium text-slate-500">{workspaceSubtitle}</p>
+            <p className="truncate text-[14px] font-bold text-text-primary">{workspaceTitle}</p>
+            <p className="truncate text-[12px] font-medium text-text-secondary">{workspaceSubtitle}</p>
           </div>
         </div>
       </div>
@@ -230,7 +230,7 @@ export function TeacherSidebar({
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 hidden w-[260px] flex-col border-r border-slate-200 bg-white transition-all xl:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-[260px] flex-col border-r border-border bg-surface transition-all xl:flex">
         {renderSidebarContent()}
       </aside>
 
@@ -240,9 +240,9 @@ export function TeacherSidebar({
             type="button"
             aria-label="Close navigation overlay"
             onClick={onClose}
-            className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]"
+            className="absolute inset-0 bg-text-primary/35 backdrop-blur-[1px]"
           />
-          <aside className="relative flex h-full w-[280px] max-w-[85vw] flex-col border-r border-slate-200 bg-white shadow-2xl">
+          <aside className="relative flex h-full w-[280px] max-w-[85vw] flex-col border-r border-border bg-surface shadow-2xl">
             {renderSidebarContent({ mobile: true })}
           </aside>
         </div>
@@ -375,14 +375,14 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-md">
       <div className="flex flex-wrap items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <button
             type="button"
             onClick={onOpenSidebar}
             aria-label="Open navigation menu"
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 xl:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-surface text-text-secondary transition hover:bg-background xl:hidden"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
@@ -391,14 +391,14 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
 
           <div className="relative min-w-0 flex-1 sm:max-w-[500px]">
             <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <svg className="h-5 w-5 text-neutral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
             <input
               type="text"
               placeholder="Search questions, papers, or tags..."
-              className="h-12 w-full rounded-2xl border-0 bg-slate-100 pl-11 pr-4 text-sm font-medium text-slate-600 ring-0 transition-all focus:bg-white focus:ring-2 focus:ring-blue-100"
+              className="input-base !pl-11 !pr-4 !bg-background !border-0"
             />
           </div>
         </div>
@@ -410,24 +410,24 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
             onClick={handleToggleMenu}
             aria-expanded={menuOpen}
             aria-label="Teacher notifications"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-50"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition hover:bg-background"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notificationsState.unreadCount > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-black text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold text-white">
                 {notificationsState.unreadCount > 9 ? '9+' : notificationsState.unreadCount}
               </span>
             ) : null}
           </button>
 
           {menuOpen ? (
-            <div className="absolute right-0 top-12 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_30px_60px_rgba(15,23,42,0.18)] sm:w-[370px]">
-              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
+            <div className="absolute right-0 top-12 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-surface shadow-2xl sm:w-[370px]">
+              <div className="flex items-center justify-between border-b border-border px-4 py-4">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Notifications</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-neutral">Notifications</p>
+                  <p className="mt-1 text-[14px] font-bold text-text-primary">
                     {notificationsState.unreadCount} unread
                   </p>
                 </div>
@@ -435,7 +435,7 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
                 <button
                   type="button"
                   onClick={handleMarkAllRead}
-                  className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+                  className="btn btn-sm btn-secondary"
                 >
                   Mark all read
                 </button>
@@ -445,21 +445,21 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
                 {notificationsState.loading ? (
                   <div className="space-y-3 p-4">
                     {Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                        <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
-                        <div className="mt-2 h-3 w-full animate-pulse rounded bg-slate-100" />
-                        <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-slate-100" />
+                      <div key={index} className="rounded-xl border border-border bg-background px-4 py-3">
+                        <div className="h-4 w-2/3 animate-pulse rounded bg-border" />
+                        <div className="mt-2 h-3 w-full animate-pulse rounded bg-border/50" />
+                        <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-border/50" />
                       </div>
                     ))}
                   </div>
                 ) : notificationsState.error ? (
                   <div className="p-4">
-                    <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    <div className="rounded-xl border border-error/20 bg-error/10 px-4 py-3 text-[14px] text-error">
                       {notificationsState.error}
                     </div>
                   </div>
                 ) : notificationsState.data.length ? (
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-border">
                     {notificationsState.data.map((notification) => {
                       const isUnread = notification.status !== 'read'
 
@@ -468,25 +468,25 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
                           key={notification.id}
                           type="button"
                           onClick={() => void handleMarkRead(notification)}
-                          className={`block w-full px-4 py-4 text-left transition hover:bg-slate-50 ${
-                            isUnread ? 'bg-sky-50/40' : ''
+                          className={`block w-full px-4 py-4 text-left transition hover:bg-background ${
+                            isUnread ? 'bg-primary/5' : ''
                           }`}
                         >
                           <div className="flex items-start gap-3">
                             <span
-                              className={`mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full ${
-                                isUnread ? 'bg-sky-500' : 'bg-slate-300'
+                              className={`mt-1 h-2 w-2 flex-shrink-0 rounded-full ${
+                                isUnread ? 'bg-primary' : 'bg-neutral'
                               }`}
                             />
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start justify-between gap-3">
-                                <p className="text-sm font-bold text-slate-900">{notification.title}</p>
-                                <span className="whitespace-nowrap text-[11px] font-semibold text-slate-400">
+                                <p className="text-[14px] font-bold text-text-primary">{notification.title}</p>
+                                <span className="whitespace-nowrap text-[11px] font-semibold text-neutral">
                                   {notification.createdAtLabel}
                                 </span>
                               </div>
                               {notification.message ? (
-                                <p className="mt-1 text-sm leading-6 text-slate-600">{notification.message}</p>
+                                <p className="mt-1 text-[13px] leading-6 text-text-secondary">{notification.message}</p>
                               ) : null}
                             </div>
                           </div>
@@ -496,8 +496,8 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
                   </div>
                 ) : (
                   <div className="px-4 py-10 text-center">
-                    <p className="text-sm font-bold text-slate-900">No notifications yet</p>
-                    <p className="mt-2 text-sm text-slate-500">New notifications from your institute will appear here.</p>
+                    <p className="text-[14px] font-bold text-text-primary">No notifications yet</p>
+                    <p className="mt-2 text-[13px] text-text-secondary">New notifications from your institute will appear here.</p>
                   </div>
                 )}
               </div>
@@ -506,16 +506,16 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
           </div>
           <a
             href="/teacher/generate-paper"
-            className="hidden h-11 items-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 sm:flex"
+            className="btn btn-md btn-primary hidden sm:flex"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             Quick Generate
           </a>
           <a
             href="/logout"
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            className="btn btn-md btn-secondary"
           >
             Logout
           </a>
@@ -527,12 +527,12 @@ export function TeacherTopbar({ onOpenSidebar = () => {} }) {
 
 export function DashboardStatCard({ title, value, icon, trend, iconBg, trendUp = true, accentColor }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-6 shadow-soft transition-all hover:shadow-card">
+    <div className="card-base card-hoverable p-6 relative">
       <div className="flex items-start justify-between">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${iconBg}`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconBg}`}>
           {icon}
         </div>
-        <div className={`flex items-center gap-1 text-xs font-bold ${trendUp ? 'text-emerald-500' : 'text-rose-500'}`}>
+        <div className={`flex items-center gap-1 text-[12px] font-bold ${trendUp ? 'text-success' : 'text-error'}`}>
           {trend}
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
             {trendUp ? <path d="M5 10l7-7m0 0l7 7m-7-7v18" /> : <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />}
@@ -540,8 +540,8 @@ export function DashboardStatCard({ title, value, icon, trend, iconBg, trendUp =
         </div>
       </div>
       <div className="mt-4">
-        <p className="text-sm font-semibold text-slate-400">{title}</p>
-        <p className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">{value}</p>
+        <p className="text-[13px] font-semibold text-text-secondary">{title}</p>
+        <p className="mt-1 text-3xl tracking-tight text-text-primary">{value}</p>
       </div>
       {/* Accent gradient bar */}
       <div className={`mt-6 h-1 w-2/3 rounded-full opacity-20 ${accentColor}`}></div>
@@ -552,10 +552,10 @@ export function DashboardStatCard({ title, value, icon, trend, iconBg, trendUp =
 export function StatusBadge({ status }) {
   const published = String(status || '').toLowerCase() === 'published'
   return (
-    <span className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest ${
+    <span className={`chip ${
       published 
-        ? 'bg-emerald-50 text-emerald-600' 
-        : 'bg-amber-50 text-amber-600'
+        ? 'chip-success' 
+        : 'chip-warning'
     }`}>
       {status}
     </span>
@@ -564,23 +564,23 @@ export function StatusBadge({ status }) {
 
 export function RecentPaperRow({ name, timestamp, subject, status }) {
   return (
-    <div className="grid grid-cols-[1.5fr,1fr,1fr,100px] items-center gap-4 border-b border-slate-50 py-5 last:border-0 hover:bg-slate-50/50 px-4 transition-all">
+    <div className="grid grid-cols-[1.5fr,1fr,1fr,100px] items-center gap-4 border-b border-border py-4 last:border-0 hover:bg-background px-4 transition-all">
       <div className="min-w-0">
-        <p className="truncate text-[15px] font-bold text-slate-900">{name}</p>
-        <p className="mt-0.5 text-xs font-semibold text-slate-400">{timestamp}</p>
+        <p className="truncate text-[15px] font-bold text-text-primary">{name}</p>
+        <p className="mt-0.5 text-[12px] font-semibold text-text-secondary">{timestamp}</p>
       </div>
-      <div className="text-sm font-semibold text-slate-600 transition-all">{subject}</div>
+      <div className="text-[14px] font-semibold text-text-secondary transition-all">{subject}</div>
       <div className="flex items-center">
          <StatusBadge status={status} />
       </div>
-      <div className="flex items-center justify-end gap-3 text-slate-400">
-        <button className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-white hover:shadow-soft hover:text-blue-600 transition-all">
-          <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <div className="flex items-center justify-end gap-3 text-text-secondary">
+        <button className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-surface hover:text-primary transition-all">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
           </svg>
         </button>
-        <button className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-white hover:shadow-soft hover:text-slate-600 transition-all">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <button className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-surface hover:text-text-primary transition-all">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
           </svg>
         </button>
@@ -596,14 +596,14 @@ export function ActionCard({ icon, label, href, iconBg, disabled = false }) {
         <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${iconBg}`}>
           {icon}
         </div>
-        <span className="text-[15px] font-bold text-slate-800">{label}</span>
+        <span className="text-[15px] font-bold text-text-primary">{label}</span>
       </div>
       {disabled ? (
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">
+        <span className="chip">
           Coming soon
         </span>
       ) : (
-        <svg className="h-5 w-5 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+        <svg className="h-5 w-5 text-neutral transition-transform group-hover:translate-x-1 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       )}
@@ -615,7 +615,7 @@ export function ActionCard({ icon, label, href, iconBg, disabled = false }) {
       <div
         aria-disabled="true"
         title="Coming soon"
-        className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 opacity-75 shadow-sm transition-all"
+        className="flex items-center justify-between card-base p-4 opacity-75 transition-all"
       >
         {content}
       </div>
@@ -625,7 +625,7 @@ export function ActionCard({ icon, label, href, iconBg, disabled = false }) {
   return (
     <a 
       href={href}
-      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50/50 group"
+      className="flex items-center justify-between card-base card-hoverable p-4 group"
     >
       {content}
     </a>
@@ -635,12 +635,12 @@ export function ActionCard({ icon, label, href, iconBg, disabled = false }) {
 export function RecentActivityItem({ icon, title, meta }) {
   return (
     <div className="flex items-start gap-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-transform hover:scale-110">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background text-text-secondary transition-transform hover:scale-110">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-[15px] font-bold text-slate-900">{title}</p>
-        <p className="mt-0.5 text-xs font-semibold text-slate-400">{meta}</p>
+        <p className="truncate text-[15px] font-bold text-text-primary">{title}</p>
+        <p className="mt-0.5 text-[12px] font-semibold text-text-secondary">{meta}</p>
       </div>
     </div>
   )

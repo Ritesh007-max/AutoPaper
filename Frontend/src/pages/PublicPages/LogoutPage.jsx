@@ -9,8 +9,8 @@ function LogoutPage() {
   }, [])
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 text-slate-900">
-      <div className="rounded-3xl border border-slate-200 bg-white px-6 py-5 text-sm text-slate-700 shadow-sm">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-text-primary">
+      <div className="rounded-3xl border border-border bg-surface px-6 py-5 text-[14px] text-text-secondary ">
         Signing out...
       </div>
     </main>

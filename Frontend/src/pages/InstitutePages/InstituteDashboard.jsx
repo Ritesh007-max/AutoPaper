@@ -419,15 +419,15 @@ function InstituteDashboard() {
               />
 
               <div className="mt-6 grid gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Last sync</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">
+                <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Last sync</p>
+                  <p className="mt-1 text-[14px] font-semibold text-text-secondary">
                     {syncedAt ? formatLongDateTime(syncedAt) : 'Loading...'}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Teachers loaded</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">
+                <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Teachers loaded</p>
+                  <p className="mt-1 text-[14px] font-semibold text-text-secondary">
                     {teachersState.loading ? 'Loading...' : `${formatNumber((teachersState.data || []).length)} shown`}
                   </p>
                 </div>

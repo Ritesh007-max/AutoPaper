@@ -112,56 +112,56 @@ function TeacherSettingsPage() {
   return (
     <div className="grid gap-5 xl:grid-cols-[1.2fr,1fr]">
       <SectionCard>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Teacher Settings</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Workspace snapshot</h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Teacher Settings</p>
+        <h1 className="mt-2 text-[30px] font-bold tracking-tight text-text-primary">Workspace snapshot</h1>
+        <p className="mt-2 text-[14px] text-text-secondary">
           This view is now driven by live question data so we can see the current bank shape without fake placeholders.
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Questions stored</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">
+          <div className="rounded-2xl border border-border bg-surface px-4 py-4">
+            <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Questions stored</p>
+            <p className="mt-1 text-[24px] font-bold text-text-primary">
               {summary.loading ? '...' : summary.totalQuestions}
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Top subject</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">{summary.loading ? '...' : summary.topSubject}</p>
+          <div className="rounded-2xl border border-border bg-surface px-4 py-4">
+            <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Top subject</p>
+            <p className="mt-1 text-[24px] font-bold text-text-primary">{summary.loading ? '...' : summary.topSubject}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Top grade</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">{summary.loading ? '...' : summary.topGrade}</p>
+          <div className="rounded-2xl border border-border bg-surface px-4 py-4">
+            <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Top grade</p>
+            <p className="mt-1 text-[24px] font-bold text-text-primary">{summary.loading ? '...' : summary.topGrade}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Latest update</p>
-            <p className="mt-1 text-sm font-semibold text-slate-700">
+          <div className="rounded-2xl border border-border bg-surface px-4 py-4">
+            <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Latest update</p>
+            <p className="mt-1 text-[14px] font-semibold text-text-secondary">
               {summary.loading ? '...' : summary.latestUpdate}
             </p>
           </div>
         </div>
 
         {summary.error ? (
-          <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-[14px] text-rose-700">
             {summary.error}
           </div>
         ) : null}
       </SectionCard>
 
       <SectionCard>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Live metadata</p>
-        <h2 className="mt-2 text-xl font-black text-slate-900">Current bank coverage</h2>
-        <ul className="mt-4 space-y-3 text-sm text-slate-600">
-          <li className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Live metadata</p>
+        <h2 className="mt-2 text-[20px] font-bold text-text-primary">Current bank coverage</h2>
+        <ul className="mt-4 space-y-3 text-[14px] text-text-secondary">
+          <li className="rounded-xl border border-border bg-background px-4 py-3">
             Available subjects: {summary.loading ? '...' : summary.availableSubjects}
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <li className="rounded-xl border border-border bg-background px-4 py-3">
             Available chapters: {summary.loading ? '...' : summary.availableChapters}
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <li className="rounded-xl border border-border bg-background px-4 py-3">
             Difficulty spread: {summary.loading ? '...' : summary.difficultySpread}
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <li className="rounded-xl border border-border bg-background px-4 py-3">
             Recent activity: {summary.loading ? '...' : summary.latestUpdate}
           </li>
         </ul>

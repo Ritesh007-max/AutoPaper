@@ -119,9 +119,9 @@ function BulkUploadQuestionsPage() {
   return (
     <div className="grid gap-5 xl:grid-cols-[1.2fr,1fr]">
       <SectionCard>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Bulk Upload</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Upload Questions via PDF</h1>
-        <p className="mt-4 text-sm leading-relaxed text-slate-600">
+        <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Bulk Upload</p>
+        <h1 className="mt-2 text-[30px] font-bold tracking-tight text-text-primary">Upload Questions via PDF</h1>
+        <p className="mt-4 text-[14px] leading-relaxed text-text-secondary">
           File type is compulsory PDF. Download the schema template first, then create your document in that format.
         </p>
 
@@ -129,7 +129,7 @@ function BulkUploadQuestionsPage() {
           <button
             type="button"
             onClick={handleDownloadTemplate}
-            className="w-full rounded-xl border border-blue-200 bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+            className="w-full rounded-xl border border-blue-200 bg-blue-50 px-5 py-2.5 text-[14px] font-semibold text-blue-700 transition hover:bg-blue-100"
           >
             Download Schema Template (PDF)
           </button>
@@ -138,7 +138,7 @@ function BulkUploadQuestionsPage() {
         <StatusBanner status={status} />
 
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-          <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500" htmlFor="bulkPdf">
+          <label className="block text-[12px] font-semibold uppercase tracking-widest text-neutral" htmlFor="bulkPdf">
             Select PDF File
           </label>
           <input
@@ -147,13 +147,13 @@ function BulkUploadQuestionsPage() {
             type="file"
             accept=".pdf,application/pdf"
             onChange={handleFileChange}
-            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-700"
+            className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-[14px] text-text-secondary file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-[14px] file:font-semibold file:text-text-secondary"
           />
 
           <button
             type="submit"
             disabled={processing}
-            className="w-full rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-xl bg-blue-600 px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {processing ? 'Validating And Uploading...' : 'Validate And Upload PDF'}
           </button>
@@ -161,15 +161,15 @@ function BulkUploadQuestionsPage() {
       </SectionCard>
 
       <SectionCard>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Schema Rules</p>
-        <h2 className="mt-2 text-2xl font-black text-slate-900">Backend Validation Fields</h2>
+        <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Schema Rules</p>
+        <h2 className="mt-2 text-[24px] font-bold text-text-primary">Backend Validation Fields</h2>
 
-        <div className="mt-5 space-y-3 text-sm text-slate-700">
-          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"><strong>Required:</strong> questionText, questionType, subject, grade, difficulty, marks</p>
-          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"><strong>questionType:</strong> MCQ | short | long | numerical</p>
-          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"><strong>difficulty:</strong> easy | medium | hard</p>
-          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"><strong>Optional:</strong> options, answer, chapter</p>
-          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"><strong>MCQ note:</strong> `options` should contain all choices and `answer` should match one valid option.</p>
+        <div className="mt-5 space-y-3 text-[14px] text-text-secondary">
+          <p className="rounded-xl border border-border bg-background px-4 py-3"><strong>Required:</strong> questionText, questionType, subject, grade, difficulty, marks</p>
+          <p className="rounded-xl border border-border bg-background px-4 py-3"><strong>questionType:</strong> MCQ | short | long | numerical</p>
+          <p className="rounded-xl border border-border bg-background px-4 py-3"><strong>difficulty:</strong> easy | medium | hard</p>
+          <p className="rounded-xl border border-border bg-background px-4 py-3"><strong>Optional:</strong> options, answer, chapter</p>
+          <p className="rounded-xl border border-border bg-background px-4 py-3"><strong>MCQ note:</strong> `options` should contain all choices and `answer` should match one valid option.</p>
         </div>
       </SectionCard>
     </div>

@@ -41,7 +41,7 @@ const startServer = async () => {
     loadEnvFile()
 
     const app = require('./app')
-    const connectDB = require('./Config/db')
+    const connectDB = require('./src/Config/db')
 
     await connectDB()
 

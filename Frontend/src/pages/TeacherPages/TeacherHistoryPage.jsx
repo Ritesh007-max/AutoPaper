@@ -52,31 +52,31 @@ function TeacherHistoryPage() {
 
   return (
     <SectionCard>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">History</p>
-      <h1 className="mt-2 text-3xl font-black text-slate-900">Recent Activity</h1>
+      <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">History</p>
+      <h1 className="mt-2 text-[30px] font-bold text-text-primary">Recent Activity</h1>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-border bg-surface">
         {loading ? (
-          <div className="px-4 py-8 text-sm text-slate-500">Loading question history...</div>
+          <div className="px-4 py-8 text-[14px] text-neutral">Loading question history...</div>
         ) : null}
 
         {!loading && historyRows.length === 0 ? (
-          <div className="px-4 py-8 text-sm text-slate-500">No saved questions found yet.</div>
+          <div className="px-4 py-8 text-[14px] text-neutral">No saved questions found yet.</div>
         ) : null}
 
         {historyRows.map((row) => (
           <article
             key={row.id}
-            className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 last:border-b-0"
+            className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-4 last:border-b-0"
           >
             <div className="min-w-0">
-              <p className="truncate text-lg font-bold text-slate-900">{row.event}</p>
-              <p className="text-sm text-slate-500">
+              <p className="truncate text-lg font-bold text-text-primary">{row.event}</p>
+              <p className="text-[14px] text-neutral">
                 {row.when} | {row.relativeTime} | {row.subject} | Grade {row.grade}
               </p>
             </div>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] ${
+              className={`rounded-full px-3 py-1 text-[12px] font-bold uppercase tracking-widest ${
                 row.status === 'Added'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-amber-100 text-amber-700'

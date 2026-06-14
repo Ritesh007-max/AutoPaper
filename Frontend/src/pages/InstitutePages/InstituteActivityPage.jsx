@@ -74,7 +74,7 @@ function InstituteActivityPage() {
             eyebrow="Recent actions"
             title="Activity timeline"
             description="Keep track of the latest actions happening across the institute."
-            action={<p className="text-sm font-semibold text-slate-500">{state.loading ? 'Loading...' : `${formatNumber(state.data.length)} events`}</p>}
+            action={<p className="text-[14px] font-semibold text-neutral">{state.loading ? 'Loading...' : `${formatNumber(state.data.length)} events`}</p>}
           />
 
           <div className="mt-6">

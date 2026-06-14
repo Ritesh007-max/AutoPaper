@@ -161,10 +161,10 @@ function TemplateButton({ title, description, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="rounded-3xl border border-slate-200 bg-white px-4 py-4 text-left transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/60"
+      className="rounded-3xl border border-border bg-surface px-4 py-4 text-left transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/60"
     >
-      <p className="text-sm font-bold text-slate-900">{title}</p>
-      <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>
+      <p className="text-[14px] font-bold text-text-primary">{title}</p>
+      <p className="mt-1 text-[14px] leading-6 text-neutral">{description}</p>
     </button>
   )
 }
@@ -177,9 +177,9 @@ function InsightTile({ label, value, tone = 'indigo' }) {
   }
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-slate-50 px-4 py-4">
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
-      <div className={`mt-3 inline-flex rounded-2xl px-3 py-2 text-lg font-black ${tones[tone] || tones.indigo}`}>
+    <div className="rounded-3xl border border-border bg-background px-4 py-4">
+      <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">{label}</p>
+      <div className={`mt-3 inline-flex rounded-2xl px-3 py-2 text-[18px] font-bold ${tones[tone] || tones.indigo}`}>
         {value}
       </div>
     </div>
@@ -441,11 +441,11 @@ function TeacherGeneratePaperPage() {
       <section className="overflow-hidden rounded-[2rem] border border-indigo-100 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.18),_transparent_34%),linear-gradient(135deg,_#ffffff,_#eef2ff_52%,_#f8fafc)] px-6 py-7 shadow-lg shadow-indigo-100/50 md:px-8 md:py-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-500">Generate Paper</p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
+            <p className="text-[12px] font-black uppercase tracking-widest text-indigo-500">Generate Paper</p>
+            <h1 className="mt-3 text-[30px] font-bold tracking-tight text-text-primary md:text-4xl">
               Plan a paper with live question-bank coverage
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+            <p className="mt-3 max-w-2xl text-[14px] leading-7 text-text-secondary md:text-base">
               Set the paper structure, filter by class context, and check whether your bank already has enough questions
               before you generate.
             </p>
@@ -462,10 +462,10 @@ function TeacherGeneratePaperPage() {
       <SectionCard>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Quick Start</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">Choose a paper style</h2>
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Quick Start</p>
+            <h2 className="mt-2 text-[24px] font-bold text-text-primary">Choose a paper style</h2>
           </div>
-          <p className="max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="max-w-2xl text-[14px] leading-6 text-neutral">
             Start from a balanced test, a rapid objective quiz, or a written practice set, then fine-tune the sections.
           </p>
         </div>
@@ -486,13 +486,13 @@ function TeacherGeneratePaperPage() {
         <SectionCard>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Paper Builder</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-900">Configure the paper</h2>
+              <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Paper Builder</p>
+              <h2 className="mt-2 text-[24px] font-bold text-text-primary">Configure the paper</h2>
             </div>
             <button
               type="button"
               onClick={handlePrepareDraft}
-              className="rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700"
+              className="rounded-2xl bg-indigo-600 px-5 py-3 text-[14px] font-bold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700"
             >
               Download PDF
             </button>
@@ -586,13 +586,13 @@ function TeacherGeneratePaperPage() {
 
           <div className="mt-8 flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Sections</p>
-              <h3 className="mt-2 text-xl font-black text-slate-900">Shape the question mix</h3>
+              <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Sections</p>
+              <h3 className="mt-2 text-[20px] font-bold text-text-primary">Shape the question mix</h3>
             </div>
             <button
               type="button"
               onClick={handleAddSection}
-              className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              className="rounded-2xl border border-border px-4 py-2.5 text-[14px] font-bold text-text-secondary transition hover:border-border hover:bg-background"
             >
               Add Section
             </button>
@@ -607,19 +607,19 @@ function TeacherGeneratePaperPage() {
                   : `${insight.availableCount} ready to use`
 
               return (
-                <article key={section.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-4 md:p-5">
+                <article key={section.id} className="rounded-[1.75rem] border border-border bg-surface/70 p-4 md:p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-3">
                         <input
-                          className="min-w-[180px] flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                          className="min-w-[180px] flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-[14px] font-bold text-text-primary outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
                           type="text"
                           value={section.title}
                           onChange={(event) => updateSectionField(section.id, 'title', event.target.value)}
                           aria-label={`Section ${index + 1} title`}
                         />
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${
+                          className={`rounded-full px-3 py-1 text-[12px] font-black uppercase tracking-widest ${
                             insight.shortfall > 0
                               ? 'bg-amber-100 text-amber-700'
                               : 'bg-emerald-100 text-emerald-700'
@@ -634,7 +634,7 @@ function TeacherGeneratePaperPage() {
                       type="button"
                       onClick={() => handleRemoveSection(section.id)}
                       disabled={blueprint.sections.length === 1}
-                      className="rounded-2xl border border-slate-200 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-600 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-2xl border border-border px-3 py-2 text-[12px] font-bold uppercase tracking-widest text-text-secondary transition hover:border-border hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Remove
                     </button>
@@ -699,9 +699,9 @@ function TeacherGeneratePaperPage() {
 
         <div className="space-y-6">
           <SectionCard>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Draft Summary</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">{blueprint.title || 'Untitled paper'}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Draft Summary</p>
+            <h2 className="mt-2 text-[24px] font-bold text-text-primary">{blueprint.title || 'Untitled paper'}</h2>
+            <p className="mt-2 text-[14px] leading-6 text-neutral">
               {blueprint.subject || 'All subjects'} {blueprint.grade ? `| Grade ${blueprint.grade}` : ''}
               {blueprint.chapter ? ` | ${blueprint.chapter}` : ''} {blueprint.duration ? `| ${blueprint.duration} min` : ''}
             </p>
@@ -712,36 +712,36 @@ function TeacherGeneratePaperPage() {
               <InsightTile label="Bank Match" value={String(scopedQuestions.length)} tone="emerald" />
             </div>
 
-            <div className="mt-6 rounded-3xl border border-slate-100 bg-slate-50 px-4 py-4">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Instructions</p>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+            <div className="mt-6 rounded-3xl border border-border bg-background px-4 py-4">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-neutral">Instructions</p>
+              <p className="mt-3 text-[14px] leading-7 text-text-secondary">
                 {blueprint.instructions || 'No instructions added yet.'}
               </p>
             </div>
           </SectionCard>
 
           <SectionCard>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Blueprint Preview</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">Section plan</h2>
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Blueprint Preview</p>
+            <h2 className="mt-2 text-[24px] font-bold text-text-primary">Section plan</h2>
 
             <div className="mt-6 space-y-4">
               {sectionInsights.map((section) => (
-                <article key={section.id} className="rounded-[1.6rem] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-100">
+                <article key={section.id} className="rounded-[1.6rem] border border-border bg-surface p-4 ">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-black text-slate-900">{section.title}</h3>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <h3 className="text-[18px] font-bold text-text-primary">{section.title}</h3>
+                      <p className="mt-1 text-[14px] text-neutral">
                         {section.questionType || 'Mixed types'} | {section.difficulty || 'Mixed difficulty'} |{' '}
                         {section.requestedCount} question(s)
                       </p>
                     </div>
-                    <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-indigo-700">
+                    <span className="rounded-full bg-indigo-50 px-3 py-1 text-[12px] font-black uppercase tracking-widest text-indigo-700">
                       {section.plannedMarks} marks
                     </span>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3">
-                    <p className="text-sm font-semibold text-slate-700">
+                  <div className="mt-4 rounded-2xl border border-dashed border-border bg-background px-4 py-3">
+                    <p className="text-[14px] font-semibold text-text-secondary">
                       {loadingQuestionBank
                         ? 'Checking matching questions from the backend...'
                         : section.shortfall > 0
@@ -750,17 +750,17 @@ function TeacherGeneratePaperPage() {
                     </p>
                     <div className="mt-3 space-y-2">
                       {loadingQuestionBank ? (
-                        <p className="text-sm leading-6 text-slate-500">
+                        <p className="text-[14px] leading-6 text-neutral">
                           Refreshing paper samples for the selected scope.
                         </p>
                       ) : section.sampleQuestions.length > 0 ? (
                         section.sampleQuestions.map((question) => (
-                          <p key={question._id} className="text-sm leading-6 text-slate-500">
+                          <p key={question._id} className="text-[14px] leading-6 text-neutral">
                             {question.questionText || 'Untitled question'}
                           </p>
                         ))
                       ) : (
-                        <p className="text-sm leading-6 text-slate-500">
+                        <p className="text-[14px] leading-6 text-neutral">
                           No sample questions match this filter combination yet.
                         </p>
                       )}

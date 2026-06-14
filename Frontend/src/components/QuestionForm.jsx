@@ -5,8 +5,8 @@ import { difficultyOptions, questionTypeOptions } from '../constants/questionFor
 function QuestionForm({ form, onChange, onReset, onSubmit }) {
   return (
     <form className="mt-6 space-y-4" onSubmit={onSubmit}>
-      <section className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">1. Question Content</p>
+      <section className="card-base p-4 bg-background">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-neutral">1. Question Content</p>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <FormField label="Subject">
@@ -74,10 +74,10 @@ function QuestionForm({ form, onChange, onReset, onSubmit }) {
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="card-base p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">2. Answer Setup</p>
-          <span className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-700">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-neutral">2. Answer Setup</p>
+          <span className="chip chip-primary">
             Required
           </span>
         </div>
@@ -110,8 +110,8 @@ function QuestionForm({ form, onChange, onReset, onSubmit }) {
         ) : null}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">3. Metadata</p>
+      <section className="card-base p-4">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-neutral">3. Metadata</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <FormField label="Difficulty">
             <select
@@ -144,13 +144,13 @@ function QuestionForm({ form, onChange, onReset, onSubmit }) {
 
       <div className="flex flex-wrap gap-3 pt-1">
         <button
-          className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="btn btn-md btn-primary"
           type="submit"
         >
           Save to Bank
         </button>
         <button
-          className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+          className="btn btn-md btn-secondary"
           type="button"
           onClick={onReset}
         >

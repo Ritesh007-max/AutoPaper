@@ -14,7 +14,7 @@ function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, descri
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-background text-text-primary">
       <TeacherSidebar
         navItems={navItems}
         activeKey={activeKey}
@@ -25,19 +25,19 @@ function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, descri
         workspaceTitle="Institute workspace"
         workspaceSubtitle="Connected admin profile"
         workspaceInitials="IA"
-        workspaceAccentClassName="bg-sky-100"
-        workspaceInitialsClassName="text-sky-700"
+        workspaceAccentClassName="bg-primary/20"
+        workspaceInitialsClassName="text-primary"
       />
 
       <div className="flex min-h-screen flex-col xl:ml-[260px]">
-        <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+        <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-md">
           <div className="flex flex-col gap-4 px-6 py-6 lg:px-8 xl:flex-row xl:items-end xl:justify-between">
             <div className="flex items-start gap-3">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Open navigation menu"
-                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 xl:hidden"
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-text-secondary transition hover:bg-background xl:hidden"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
@@ -45,9 +45,9 @@ function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, descri
               </button>
 
               <div className="max-w-3xl">
-                <p className="text-xs font-bold uppercase tracking-[0.28em] text-sky-500">{eyebrow}</p>
-                <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
-                {description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{description}</p> : null}
+                <p className="text-[11px] font-bold uppercase tracking-widest text-primary">{eyebrow}</p>
+                <h1 className="mt-2 text-[24px] font-bold tracking-tight text-text-primary sm:text-[30px]">{title}</h1>
+                {description ? <p className="mt-2 max-w-2xl text-[14px] leading-6 text-text-secondary">{description}</p> : null}
               </div>
             </div>
 
@@ -55,7 +55,7 @@ function InstituteLayout({ activeKey, eyebrow = 'Institute Admin', title, descri
               {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
               <a
                 href="/logout"
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                className="btn btn-md btn-secondary"
               >
                 Logout
               </a>

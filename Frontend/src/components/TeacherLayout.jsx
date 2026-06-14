@@ -6,7 +6,7 @@ function TeacherLayout({ navItems, activeKey, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-background text-text-primary">
       <TeacherSidebar
         navItems={navItems}
         activeKey={activeKey}

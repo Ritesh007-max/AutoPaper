@@ -1,11 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 
-const authRoutes = require('./routes/auth')
-const teacherRoutes = require('./routes/teacher')
-const instituteRoutes = require('./routes/institute')
-const adminRoutes = require('./routes/admin')
-const { apiLimiter } = require('./middleware/rateLimit')
+const authRoutes = require('./src/routes/auth')
+const teacherRoutes = require('./src/routes/teacher')
+const instituteRoutes = require('./src/routes/institute')
+const adminRoutes = require('./src/routes/admin')
+const { apiLimiter } = require('./src/middleware/rateLimit')
 
 const app = express()
 

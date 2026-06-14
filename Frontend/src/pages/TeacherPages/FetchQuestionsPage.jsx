@@ -144,8 +144,8 @@ function TeacherQuestionsPage() {
   return (
     <div className="grid gap-5 xl:grid-cols-[330px,1fr]">
       <SectionCard>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Question Bank</p>
-        <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900">Filter Questions</h1>
+        <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Question Bank</p>
+        <h1 className="mt-2 text-[24px] font-bold tracking-tight text-text-primary">Filter Questions</h1>
 
         <form className="mt-5 space-y-3.5" onSubmit={applyFilters}>
           <FormField label="Subject">
@@ -235,13 +235,13 @@ function TeacherQuestionsPage() {
 
           <div className="flex gap-3 pt-2">
             <button
-              className="flex-1 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+              className="flex-1 rounded-xl bg-blue-600 px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-blue-700"
               type="submit"
             >
               Apply Filters
             </button>
             <button
-              className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              className="rounded-xl border border-border px-5 py-2.5 text-[14px] font-semibold text-text-secondary transition hover:border-slate-400 hover:bg-background"
               type="button"
               onClick={clearFilters}
             >
@@ -250,7 +250,7 @@ function TeacherQuestionsPage() {
           </div>
 
           {loadingFilterOptions ? (
-            <p className="text-xs text-slate-500">Loading filter values...</p>
+            <p className="text-[12px] text-neutral">Loading filter values...</p>
           ) : null}
         </form>
       </SectionCard>
@@ -258,11 +258,11 @@ function TeacherQuestionsPage() {
       <SectionCard>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fetched Questions</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">Question List</h2>
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-neutral">Fetched Questions</p>
+            <h2 className="mt-2 text-[24px] font-bold text-text-primary">Question List</h2>
           </div>
           <button
-            className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+            className="rounded-xl border border-border px-4 py-2.5 text-[14px] font-semibold text-text-secondary transition hover:border-slate-400 hover:bg-background"
             type="button"
             onClick={refreshQuestions}
           >
@@ -273,10 +273,10 @@ function TeacherQuestionsPage() {
         <StatusBanner status={status} />
 
         <div className="mt-6 space-y-4">
-          {loading ? <p className="text-sm text-slate-500">Loading questions...</p> : null}
+          {loading ? <p className="text-[14px] text-neutral">Loading questions...</p> : null}
 
           {!loading && questions.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center text-slate-500">
+            <div className="rounded-xl border border-dashed border-border px-6 py-12 text-center text-neutral">
               No questions found for selected filters.
             </div>
           ) : null}
